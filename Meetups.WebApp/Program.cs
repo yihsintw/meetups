@@ -1,11 +1,25 @@
-//using Meetups.WebApp.Components;
+using Microsoft.EntityFrameworkCore;
+using Meetups.WebApp.Features.Events.CreateEvent;
 using Meetups.WebApp.Shared;
+using Meetups.WebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<CreateEventService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+{
+    //options.UseInMemoryDatabase("Meetups");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MeetupConnection"));
+}); 
+//builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+//{
+//    options.UseInMemoryDatabase("Meetups");
+//});
 
 var app = builder.Build();
 

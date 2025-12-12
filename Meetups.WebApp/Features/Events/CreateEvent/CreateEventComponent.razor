@@ -1,5 +1,8 @@
 ﻿@page "/events/create"
 
+@inject CreateEventService createEventService;
+@inject NavigationManager NavigationManager;
+
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <div class="alert alert-danger" role="alert">
@@ -49,13 +52,13 @@
     </div>
 
     <div class="mb-3">
-        <label for="Location" class="form-label">Venue Address  </label>
+        <label for="Location" class="form-label">Venue Address</label>
         <InputText id="location" class="form-control" @bind-Value="_eventViewModel.Location" />
         <ValidationMessage For="@(() => _eventViewModel.Location)" />
     </div>
 
     <div class="mb-3">
-        <label for="Capacity" class="form-label">Venue Address  </label>
+        <label for="Capacity" class="form-label">Capacity</label>
         <input type="number" id="location" class="form-control" @bind-value="_eventViewModel.Capacity" />
         <ValidationMessage For="@(() => _eventViewModel.Capacity)" />
     </div>
@@ -71,10 +74,24 @@
 @code {
     private EventViewModel _eventViewModel = new();
     private string errorMessage = "";
-    private void CreateEvent()
+    private async Task CreateEvent()
     {
         // Logic to create the event goes here.
         // For now, we can just navigate back to the main page or show a success message.
+        errorMessage = createEventService.ValicateEvent(_eventViewModel);
+
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return;
+        }
+
+        await createEventService.CreateEventAsync(_eventViewModel);
+
+        // Navigate to the main page after creation
+        NavigationManager.NavigateTo("/");
+        
+
+        /*
         errorMessage = _eventViewModel.ValidateDates();
         if (!string.IsNullOrEmpty(errorMessage))
         {
@@ -95,6 +112,8 @@
             // Validation failed, do not proceed.
             return;
         }
+        */
+
     }
 
 }
