@@ -1,23 +1,30 @@
-﻿using Meetups.WebApp.Data;
+﻿using AutoMapper;
+using Meetups.WebApp.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Meetups.WebApp.Features.Events.CreateEvent
 {
     public class CreateEventService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext>? _contextFactory;
+        private readonly IMapper? mapper;
+
         public CreateEventService()
         {
             
         }
-        public CreateEventService(IDbContextFactory<ApplicationDbContext> contextFactory)
+        public CreateEventService(IDbContextFactory<ApplicationDbContext> contextFactory,
+            IMapper mapper)
         {
             _contextFactory = contextFactory;
+            this.mapper = mapper;
         }
 
         public async Task CreateEventAsync(EventViewModel model)
         {
-            using var context = _contextFactory.CreateDbContext();
+            using var context = _contextFactory!.CreateDbContext();
+
+            /*
             var newEvent = new Data.Entities.Event
             {
                 Title = model.Title,
@@ -33,7 +40,14 @@ namespace Meetups.WebApp.Features.Events.CreateEvent
                 OrganizerId = model.OrganizerId
             };
             context.Events.Add(newEvent);
-            await context.SaveChangesAsync();
+            */
+            var eventEntity = mapper?.Map<Data.Entities.Event>(model);
+            if (eventEntity!=null)
+            {
+                context.Events.Add(eventEntity);
+                await context.SaveChangesAsync();
+            }
+            
         }
 
         public string ValicateEvent(EventViewModel model)

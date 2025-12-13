@@ -1,12 +1,60 @@
 ﻿@page "/"
+@using Meetups.WebApp.Features.Events.CreateEvent
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ViewCreatedEventsService ViewCreatedEventsService;
 
 <h3>Created Events</h3>
+total count: @totalCount
 
+@if (createdEvents is not null && createdEvents.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                @* <th>Description</th> *@
+                <th>Begin Time</th>
+                <th>End Time</th>
+                @* <th>Location</th> *@
+                <th>Capacity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var eventItem in createdEvents)
+            {
+                <tr>
+                    <td>@eventItem.Title</td>
+                    @* <td>@eventItem.Description</td> *@
+                    <td>@eventItem.BeginDate @eventItem.BeginTime</td>
+                    <td>@eventItem.EndDate  @eventItem.EndTime</td>
+                    @* <td>@eventItem.Location</td> *@
+                    <td>@(eventItem.Capacity==0?"Unlimited":eventItem.Capacity.ToString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 @* <button class="btn btn-primary" @onclick="CreateEvent">Create Event</button> *@
 <a href="/events/create" class="btn btn-primary">Create New Meetup</a>
 @code {
-    private void CreateEvent()
+    private int totalCount = 0;
+    private List<EventViewModel> createdEvents = new();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {   
+            createdEvents = await ViewCreatedEventsService.GetAllEventsAsync();
+            totalCount = createdEvents.Count;
+            StateHasChanged();
+        }
         
+         //base.OnAfterRenderAsync(firstRender);    
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //createdEvents = await ViewCreatedEventsService.GetAllEventsAsync();
+    }
+        
 }

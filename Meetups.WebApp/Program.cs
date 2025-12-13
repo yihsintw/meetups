@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Meetups.WebApp.Features.Events.CreateEvent;
 using Meetups.WebApp.Shared;
 using Meetups.WebApp.Data;
+using Meetups.WebApp.Features.Events.ViewCreatedEvents;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<CreateEventService>();
+builder.Services.AddTransient<ViewCreatedEventsService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -20,6 +22,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 //{
 //    options.UseInMemoryDatabase("Meetups");
 //});
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
