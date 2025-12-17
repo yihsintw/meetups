@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Meetups.WebApp.Shared.ViewModels;
 
 namespace Meetups.WebApp.Shared
 {
@@ -9,8 +10,8 @@ namespace Meetups.WebApp.Shared
             // Example:
             // CreateMap<Source, Destination>();
 
-            CreateMap<Features.Events.CreateEvent.EventViewModel, Data.Entities.Event>();
-            CreateMap<Data.Entities.Event, Features.Events.CreateEvent.EventViewModel>();
+            CreateMap<EventViewModel, Data.Entities.Event>();
+            CreateMap<Data.Entities.Event, EventViewModel>();
 
 
 

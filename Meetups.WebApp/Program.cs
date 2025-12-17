@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Meetups.WebApp.Features.Events.CreateEvent;
 using Meetups.WebApp.Shared;
 using Meetups.WebApp.Data;
-using Meetups.WebApp.Features.Events.ViewCreatedEvents;
+using Meetups.WebApp.Features.ViewCreatedEvents;
+using Meetups.WebApp.Features.CreateEvent;
 
 var builder = WebApplication.CreateBuilder(args);
 

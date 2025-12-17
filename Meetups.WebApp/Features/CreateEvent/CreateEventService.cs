@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Meetups.WebApp.Data;
+using Meetups.WebApp.Shared;
+using Meetups.WebApp.Shared.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
-namespace Meetups.WebApp.Features.Events.CreateEvent
+namespace Meetups.WebApp.Features.CreateEvent
 {
     public class CreateEventService
     {
@@ -67,5 +70,13 @@ namespace Meetups.WebApp.Features.Events.CreateEvent
                 return linkValidationMessage;
             return string.Empty;
         }
+
+        //GetCategory
+        public List<string> GetCategories()
+        {
+            return [.. Enum.GetNames<MeetupCategoriesEnum>()];
+        }
+
+
     }
 }

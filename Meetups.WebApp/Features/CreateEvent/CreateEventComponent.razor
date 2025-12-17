@@ -1,0 +1,241 @@
+﻿@page "/events/create"
+@using Meetups.WebApp.Shared.ViewModels
+@using SixLabors.ImageSharp.Processing
+
+@inject CreateEventService createEventService;
+@inject NavigationManager NavigationManager;
+
+
+<ErrorMessageComponent ErrorMessage="@errorMessage" />
+
+
+<h3>Create Event</h3>
+
+<EditForm Model="_eventViewModel" OnValidSubmit="CreateEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <InputText id="title" class="form-control" @bind-Value="_eventViewModel.Title" />
+        <ValidationMessage For="@(() => _eventViewModel.Title)" />
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="_eventViewModel.Description" />
+        <ValidationMessage For="@(() => _eventViewModel.Description)" />
+    </div>
+    <div class="mb-3">
+        <label for="BeginDate" class="form-label">Begin Date</label>
+        <InputDate id="beginDate" class="form-control" @bind-Value="_eventViewModel.BeginDate" />
+        <ValidationMessage For="@(() => _eventViewModel.BeginDate)" />
+    </div>
+    
+    
+    <div class="mb-3">
+        <label for="BeginTime" class="form-label">Begin Time</label>
+        <input type="time" id="beginTime" class="form-control" @bind-value="_eventViewModel.BeginTime" />
+        <ValidationMessage For="@(() => _eventViewModel.BeginTime)" />    
+    </div>
+
+
+    <div class="mb-3">
+        <label for="EndDate" class="form-label">End Date</label>
+        <InputDate id="endDate" class="form-control" @bind-Value="_eventViewModel.EndDate" />
+        <ValidationMessage For="@(() => _eventViewModel.EndDate)" />
+    </div>
+    <div class="mb-3">
+        <label for="EndTime" class="form-label">End Time</label>
+        <input type="time" id="endTime" class="form-control" @bind-value="_eventViewModel.EndTime" />
+        <ValidationMessage For="@(() => _eventViewModel.EndTime)" />    
+    </div>
+
+    <div class="mb-3">
+        <label for="Capacity" class="form-label">Capacity</label>
+        <InputNumber type="number" id="location" class="form-control" @bind-Value="_eventViewModel.Capacity" />
+        <ValidationMessage For="@(() => _eventViewModel.Capacity)" />
+    </div>
+
+    @* Category *@
+    <div class="mb-3">
+        <label for="Category" class="form-label">Category</label>
+        <InputSelect id="category" class="form-control" @bind-Value="_eventViewModel.Category">
+            /* get categories from enum */
+            <option value="" selected>Select a Category</option>
+            @foreach (var category in createEventService.GetCategories())
+            {
+                <option value="@category">@category</option>
+            }
+            
+        </InputSelect>
+        <ValidationMessage For="@(() => _eventViewModel.Category)" />   
+    </div>
+    
+    @*Based on category selected, either display Venue Address(Location) or MeetupLink*@
+    @if (_eventViewModel.Category == "InPerson")
+    {
+        <div class="mb-3">
+            <label for="Location" class="form-label">Venue Address</label>
+            <InputText id="location" class="form-control" @bind-Value="_eventViewModel.Location" />
+            <ValidationMessage For="@(() => _eventViewModel.Location)" />
+        </div>
+    }
+    else if (_eventViewModel.Category == "Online")
+    {
+        <div class="mb-3">
+            <label for="MeetupLink" class="form-label">Meetup Link</label>
+            <InputText id="meetupLink" class="form-control" @bind-Value="_eventViewModel.MeetupLink" />
+            <ValidationMessage For="@(() => _eventViewModel.MeetupLink)" />
+        </div>
+    }
+
+
+    
+
+    
+
+    <div class="mb-3">
+        <label for="CoverImage" class="form-label">Cover Image</label>
+        <div class="form-group">
+            <InputFile id="coverImage" class="form-control" OnChange="HandleImageUpload" accept=".png" />
+            <ValidationMessage For="@(() => _eventViewModel.CoverImage)" />
+        </div>
+        
+    </div>
+    <br/>
+
+    
+
+    @* Display the uploaded image *@
+    @if (!string.IsNullOrEmpty(_eventViewModel.ImageUrl))
+    {
+        <div class="mb-3">
+            <div>
+                <img src="@_eventViewModel.ImageUrl" alt="Cover Image" style="max-width: 300px; max-height: 169px;" />
+            </div>
+        </div>
+    }
+
+    <br/>
+    <ErrorMessageComponent ErrorMessage="@errorMessage" />
+    
+    <button type="submit" class="btn btn-primary">Create Event</button>
+    &nbsp;
+    @* <button type="reset" class="btn btn-secondary">Reset</button>
+    &nbsp; *@
+    <NavLink class="btn btn-light" href="/">Cancel</NavLink>
+
+   
+</EditForm>
+
+
+@code {
+    private EventViewModel _eventViewModel = new();
+    private string errorMessage = "";
+    private async Task CreateEvent()
+    {
+        // Logic to create the event goes here.
+        // For now, we can just navigate back to the main page or show a success message.
+        errorMessage = createEventService.ValicateEvent(_eventViewModel);
+
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return;
+        }
+
+        await createEventService.CreateEventAsync(_eventViewModel);
+
+        // Navigate to the main page after creation
+        NavigationManager.NavigateTo("/");
+
+
+        /*
+        errorMessage = _eventViewModel.ValidateDates();
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            // Validation failed, do not proceed.
+            return;
+            }
+
+        errorMessage = _eventViewModel.ValidateLocation();
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            // Validation failed, do not proceed.
+            return;
+            }
+
+        errorMessage = _eventViewModel.ValidateMeetupLink();
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            // Validation failed, do not proceed.
+            return;
+            }
+        */
+
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+
+        _eventViewModel.ImageUrl = "/images/placeholder.png";
+        _eventViewModel.CoverImage = e.File;
+
+        if (_eventViewModel.CoverImage == null)
+        {
+            errorMessage = "No file selected.";
+            return;
+        }
+
+        //validate file and make sue file size is less than 500kb
+        if (_eventViewModel.CoverImage.Size > 500 * 1024)
+        {
+            errorMessage = "Cover image size should not exceed 500KB.";
+            _eventViewModel.CoverImage = null;
+            return;
+        }
+
+        errorMessage = string.Empty;
+
+        //generate unique file name
+        var uniqueFileName = $"{Guid.NewGuid().ToString() + Path.GetExtension(_eventViewModel.CoverImage.Name)}";
+        var filePath = Path.Combine("wwwroot", "images","events", uniqueFileName);
+
+        // resize the image if needed
+        using var imageStream = _eventViewModel.CoverImage.OpenReadStream(5 * 1024 * 1024); // limit to 5MB 
+        using var image = await SixLabors.ImageSharp.Image.LoadAsync(imageStream);
+
+        image.Mutate(x => x.Resize(300,169));
+
+        using var outputStream = new FileStream(filePath, FileMode.Create);
+        await image.SaveAsync(outputStream, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+        _eventViewModel.ImageUrl = $"/images/events/{uniqueFileName}";
+
+        /*image.Mutate(x => x.Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+        {
+            Size = new SixLabors.ImageSharp.Size(800, 600),
+            Mode = SixLabors.ImageSharp.Processing.ResizeMode.Max
+        }));*/
+
+
+
+            
+
+        // if (_eventViewModel.CoverImage != null)
+        // {
+        //     // Optionally, you can add validation for the image file here (e.g., file size, type).
+        //     // For example, limit file size to 2MB
+        //     if (_eventViewModel.CoverImage.Size > 2 * 1024 * 1024)
+        //     {
+        //         errorMessage = "Cover image size should not exceed 2MB.";
+        //         _eventViewModel.CoverImage = null;
+        //         return;
+        //     }
+        //     // You can also read the file content if needed
+        //     var buffer = new byte[_eventViewModel.CoverImage.Size];
+        //     await _eventViewModel.CoverImage.OpenReadStream().ReadAsync(buffer);
+        //     // Do something with the image data if necessary
+        // }
+
+                
+    }
+    
+}

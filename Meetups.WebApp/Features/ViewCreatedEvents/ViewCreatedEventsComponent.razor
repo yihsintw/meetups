@@ -1,17 +1,21 @@
 ﻿@page "/"
-@using Meetups.WebApp.Features.Events.CreateEvent
+@using Meetups.WebApp.Features.CreateEvent
+@using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ViewCreatedEventsService ViewCreatedEventsService;
 
 <h3>Created Events</h3>
-total count: @totalCount
+<div>
+    Total count: @totalCount
+</div>
 
 @if (createdEvents is not null && createdEvents.Count > 0)
 {
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Title</th>
+                
+                <th style="width:150px;text-align:center">Title</th>
                 @* <th>Description</th> *@
                 <th>Begin Time</th>
                 <th>End Time</th>
@@ -23,7 +27,20 @@ total count: @totalCount
             @foreach (var eventItem in createdEvents)
             {
                 <tr>
-                    <td>@eventItem.Title</td>
+                    <td style="text-align:center">
+                        @{
+                            var imageUrl = string.IsNullOrEmpty(eventItem.ImageUrl) ? "/images/placeholder.png" : eventItem.ImageUrl;
+                            if (!string.IsNullOrEmpty(imageUrl))
+                            {
+                                <img class="img-thumbnail" src="@imageUrl" alt="Event Image" style="width:100px" />
+                            }
+                            <br/>
+                            @eventItem.Title
+                        }
+                        
+                    </td>
+
+                    
                     @* <td>@eventItem.Description</td> *@
                     <td>@eventItem.BeginDate @eventItem.BeginTime</td>
                     <td>@eventItem.EndDate  @eventItem.EndTime</td>
