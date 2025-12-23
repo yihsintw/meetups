@@ -71,11 +71,7 @@ namespace Meetups.WebApp.Features.CreateEvent
             return string.Empty;
         }
 
-        //GetCategory
-        public List<string> GetCategories()
-        {
-            return [.. Enum.GetNames<MeetupCategoriesEnum>()];
-        }
+        
 
 
     }

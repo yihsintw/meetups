@@ -1,0 +1,84 @@
+﻿@page "/events/edit/{eventid:int}"
+@using Meetups.WebApp.Shared.ViewModels
+@inject NavigationManager NavigationManager
+@inject EditEventService editEventService
+
+<h3>Edit Event</h3>
+@if (_eventViewModel is not null)
+{
+    <AddUpdateEventComponent EventViewModel="@_eventViewModel"
+                             OnSaved="UpdateEvent"
+                             errorMessage="@errorMessage"
+                             ErrorMessageChanged="OnErrorMessageChanged">
+
+        <ErrorMessageFragment>
+            <ErrorMessageComponent ErrorMessage="@errorMessage" />
+        </ErrorMessageFragment>
+    </AddUpdateEventComponent>
+}
+else 
+{
+    if (errorMessage != null)
+    {
+        <ErrorMessageComponent ErrorMessage="@errorMessage" />
+    }
+    
+}
+
+
+@code {
+    [Parameter]
+    public int eventId { get; set; }
+    public EventViewModel? _eventViewModel { get; set; }
+    public string? errorMessage { get; set; }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _eventViewModel = await editEventService.GetEventForEditAsync(eventId);
+
+            if (_eventViewModel == null)
+            {
+                errorMessage = "Event not found.";
+                StateHasChanged();
+                return;
+            }
+                // this.insert new ErrorMessageComponent().ErrorMessage = "Event not found.";
+
+            
+            StateHasChanged();
+        }
+        
+    }
+
+    private async Task OnErrorMessageChanged(string message)
+    {
+        errorMessage = message;
+    }
+
+    private async Task UpdateEvent()
+    {
+        if (_eventViewModel is null)
+            return;
+
+        // Logic to create the event goes here.
+        // For now, we can just navigate back to the main page or show a success message.
+        errorMessage = _eventViewModel.Validate();
+
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return;
+        }
+
+        await editEventService.UpdateEventAsync(_eventViewModel);
+
+        // Navigate to the main page after creation
+        NavigationManager.NavigateTo("/");
+
+
+        
+
+    }
+}

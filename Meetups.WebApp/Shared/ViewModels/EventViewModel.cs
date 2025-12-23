@@ -25,7 +25,7 @@ namespace Meetups.WebApp.Shared.ViewModels
         public string? Category { get; set; } = string.Empty;
         [Range(0,int.MaxValue)]
         public int Capacity { get; set; }
-        [Required(ErrorMessage = "Please upload an image for the meetup.")]
+        //[Required(ErrorMessage = "Please upload an image for the meetup.")]
         public IBrowserFile? CoverImage { get; set; }
         public string ImageUrl { get; set; }
         public int OrganizerId { get; set; }
@@ -58,7 +58,16 @@ namespace Meetups.WebApp.Shared.ViewModels
             return string.Empty;
         }
 
-       public EventViewModel()
+        //validate coverimage
+        public string ValidateCoverImage()
+        {
+            if (CoverImage == null && EventId <=0)
+                return "Please upload an image for the meetup.";
+            return string.Empty;
+        }
+
+
+        public EventViewModel()
         {
             BeginDate = DateOnly.FromDateTime(DateTime.Now);
             EndDate = DateOnly.FromDateTime(DateTime.Now);
@@ -70,6 +79,22 @@ namespace Meetups.WebApp.Shared.ViewModels
 
             //CoverImage = IBrowserFile.
            
+        }
+
+        public string Validate() {        
+            var dateValidationMessage = ValidateDates();
+            if (!string.IsNullOrEmpty(dateValidationMessage))
+                return dateValidationMessage;
+            var locationValidationMessage = ValidateLocation();
+            if (!string.IsNullOrEmpty(locationValidationMessage))
+                return locationValidationMessage;
+            var linkValidationMessage = ValidateMeetupLink();
+            if (!string.IsNullOrEmpty(linkValidationMessage))
+                return linkValidationMessage;
+            var coverImageValidationMessage = ValidateCoverImage();
+            if (!string.IsNullOrEmpty(coverImageValidationMessage))
+                return coverImageValidationMessage;
+            return string.Empty;
         }
 
     }

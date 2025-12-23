@@ -28,16 +28,17 @@
             {
                 <tr>
                     <td style="text-align:center">
-                        @{
-                            var imageUrl = string.IsNullOrEmpty(eventItem.ImageUrl) ? "/images/placeholder.png" : eventItem.ImageUrl;
-                            if (!string.IsNullOrEmpty(imageUrl))
-                            {
-                                <img class="img-thumbnail" src="@imageUrl" alt="Event Image" style="width:100px" />
+                        <a href="/events/edit/@eventItem.EventId" class="btn btn-primary">
+                            @{
+                                var imageUrl = string.IsNullOrEmpty(eventItem.ImageUrl) ? "/images/placeholder.png" : eventItem.ImageUrl;
+                                if (!string.IsNullOrEmpty(imageUrl))
+                                {
+                                    <img class="img-thumbnail" src="@imageUrl" alt="Event Image" style="width:100px" />
+                                }
+                                <br />
+                                @eventItem.Title
                             }
-                            <br/>
-                            @eventItem.Title
-                        }
-                        
+                        </a>
                     </td>
 
                     

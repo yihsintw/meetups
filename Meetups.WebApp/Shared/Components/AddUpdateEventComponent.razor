@@ -1,0 +1,194 @@
+﻿@using Meetups.WebApp.Shared.ViewModels
+@using SixLabors.ImageSharp.Processing
+@inject SharedHelper sharedHelper
+
+@if (EventViewModel == null)
+{
+    EventViewModel = new EventViewModel();
+}
+<EditForm Model="EventViewModel" OnValidSubmit="Save" OnInvalidSubmit="() => ErrorMessageChanged.InvokeAsync(string.Empty)">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="title" class="form-label">Title</label>
+        <InputText id="title" class="form-control" @bind-Value="EventViewModel!.Title" />
+        <ValidationMessage For="@(() => EventViewModel.Title)" />
+    </div>
+    <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="EventViewModel.Description" />
+        <ValidationMessage For="@(() => EventViewModel.Description)" />
+    </div>
+    <div class="form-group">
+        <label for="BeginDate" class="form-label">Begin Date</label>
+        <InputDate id="beginDate" class="form-control" @bind-Value="EventViewModel.BeginDate" />
+        <ValidationMessage For="@(() => EventViewModel.BeginDate)" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="BeginTime" class="form-label">Begin Time</label>
+        <input type="time" id="beginTime" class="form-control" @bind-value="EventViewModel.BeginTime" />
+        <ValidationMessage For="@(() => EventViewModel.BeginTime)" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="EndDate" class="form-label">End Date</label>
+        <InputDate id="endDate" class="form-control" @bind-Value="EventViewModel.EndDate" />
+        <ValidationMessage For="@(() => EventViewModel.EndDate)" />
+    </div>
+    <div class="form-group">
+        <label for="EndTime" class="form-label">End Time</label>
+        <input type="time" id="endTime" class="form-control" @bind-value="EventViewModel.EndTime" />
+        <ValidationMessage For="@(() => EventViewModel.EndTime)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Capacity" class="form-label">Capacity</label>
+        <InputNumber type="number" id="location" class="form-control" @bind-Value="EventViewModel.Capacity" />
+        <ValidationMessage For="@(() => EventViewModel.Capacity)" />
+    </div>
+
+    @* Category *@
+    <div class="form-group">
+        <label for="Category" class="form-label">Category</label>
+        <InputSelect id="category" class="form-control" @bind-Value="EventViewModel.Category">
+            /* get categories from enum */
+            <option value="" selected>Select a Category</option>
+            @foreach (var category in sharedHelper.GetCategories())
+            {
+                <option value="@category">@category</option>
+            }
+
+        </InputSelect>
+        <ValidationMessage For="@(() => EventViewModel.Category)" />
+    </div>
+
+    @*Based on category selected, either display Venue Address(Location) or MeetupLink*@
+    @if (EventViewModel.Category == "InPerson")
+    {
+        EventViewModel.MeetupLink = string.Empty;
+        <div class="form-group">
+            <label for="Location" class="form-label">Venue Address</label>
+            <InputText id="location" class="form-control" @bind-Value="EventViewModel.Location" />
+            <ValidationMessage For="@(() => EventViewModel.Location)" />
+        </div>
+    }
+    else if (EventViewModel.Category == "Online")
+    {
+        EventViewModel.Location = string.Empty;
+        <div class="form-group">
+            <label for="MeetupLink" class="form-label">Meetup Link</label>
+            <InputText id="meetupLink" class="form-control" @bind-Value="EventViewModel.MeetupLink" />
+            <ValidationMessage For="@(() => EventViewModel.MeetupLink)" />
+        </div>
+    }
+
+    <div class="form-group">
+        <label for="CoverImage" class="form-label">Cover Image</label>
+        <div class="form-group">
+            <InputFile id="coverImage" class="form-control" OnChange="HandleImageUpload" accept=".png" />
+            <ValidationMessage For="@(() => EventViewModel.CoverImage)" />
+        </div>
+
+    </div>
+    <br />
+
+    @* Display the uploaded image *@
+    @if (!string.IsNullOrEmpty(EventViewModel.ImageUrl))
+    {
+        <div class="mb-3">
+            <div>
+                <img src="@EventViewModel.ImageUrl" alt="Cover Image" style="max-width: 300px; max-height: 169px;" />
+            </div>
+        </div>
+    }
+    <br />
+    @if (ErrorMessageFragment != null)
+    {
+        @ErrorMessageFragment;
+    }
+    <br /> 
+    <ValidationSummary />
+
+    <button id="btnSave" type="submit" class="btn btn-primary">
+        @if (EventViewModel !=null && EventViewModel.EventId > 0)
+        {
+            <text>Update Event</text>
+        }
+        else
+        {
+            <text>Create Event</text>
+        }
+        
+        </button>
+    &nbsp;
+    @* <button type="reset" class="btn btn-secondary">Reset</button>
+    &nbsp; *@
+    <NavLink class="btn btn-light" href="/">Cancel</NavLink>
+
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventViewModel? EventViewModel { get; set; }
+    [Parameter]
+    public string errorMessage { get; set; }  = string.Empty;
+    [Parameter]
+    public RenderFragment? ErrorMessageFragment { get; set; }
+    [Parameter]
+    public EventCallback<EventViewModel> OnSaved { get; set; }
+    [Parameter]
+    public EventCallback<string> ErrorMessageChanged { get; set; }
+
+    private async Task Save()
+    {
+        // Logic to save or update the event
+        await OnSaved.InvokeAsync(EventViewModel);
+    }   
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {   
+        if (EventViewModel == null)
+            return;
+
+        EventViewModel!.ImageUrl = "/images/placeholder.png";
+        EventViewModel.CoverImage = e.File;
+
+        if (EventViewModel.CoverImage == null)
+        {
+            errorMessage = "No file selected.";
+            return;
+        }
+
+        //validate file and make sue file size is less than 500kb
+        if (EventViewModel.CoverImage.Size > 500 * 1024)
+        {
+            errorMessage = "Cover image size should not exceed 5MB.";
+            await ErrorMessageChanged.InvokeAsync(errorMessage);
+            EventViewModel.CoverImage = null;
+            return;
+        }
+
+        errorMessage = string.Empty;
+
+        //generate unique file name
+        var uniqueFileName = $"{Guid.NewGuid().ToString() + Path.GetExtension(EventViewModel.CoverImage.Name)}";
+        var filePath = Path.Combine("wwwroot", "images", "events", uniqueFileName);
+
+        // resize the image if needed
+        using var imageStream = EventViewModel.CoverImage.OpenReadStream(5 * 1024 * 1024); // limit to 5MB
+        using var image = await SixLabors.ImageSharp.Image.LoadAsync(imageStream);
+
+        image.Mutate(x => x.Resize(300, 169));
+
+        using var outputStream = new FileStream(filePath, FileMode.Create);
+        await image.SaveAsync(outputStream, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+        EventViewModel.ImageUrl = $"/images/events/{uniqueFileName}";
+
+        
+
+
+    }
+}
