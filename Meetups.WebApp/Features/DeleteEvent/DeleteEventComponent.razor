@@ -1,0 +1,96 @@
+﻿    @using Meetups.WebApp.Shared.ViewModels
+@inject DeleteEventService deleteEventService
+
+<ErrorMessageComponent ErrorMessage="@errorMessage" />
+<button @ref="btnDelete" class="@ButtonClass" @onclick="HandleDeleteEvent"
+        
+>
+    Delete Event
+</button>
+<ConfirmDialogComponent @ref="confirmDialogComponent" />
+@code {
+    //private bool buttonDisabled = false;
+    private ElementReference btnDelete;
+    private ConfirmDialogComponent? confirmDialogComponent;
+
+    [Parameter]
+    public string? ButtonClass { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDeleted { get; set; }
+
+    public int eventId { get; set; }
+
+    public string? EventName { get; set; }
+
+    [Parameter]
+    public EventViewModel? EventViewModel { get; set; }
+    public string? errorMessage { get; set; }
+
+    private async Task HandleDeleteEvent()
+    {
+        confirmDialogComponent?.Show($"Are you sure you want to delete this event - {EventName}?",
+        async (sender) =>
+        {
+            var result = sender;
+            if(result == "ok")
+            {
+                errorMessage = await deleteEventService.DeleteEventAsync(eventId);
+
+                if(!string.IsNullOrEmpty(errorMessage))
+                {
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }   
+                // Implement your delete logic here
+                // For example, call a service to delete the event by eventId
+                //errorMessage = $"Event '{EventName}' has been deleted.";
+
+
+                await OnDeleted.InvokeAsync(eventId);
+                //StateHasChanged();
+            }
+        
+        });
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        
+
+        //StateHasChanged();
+
+        if (firstRender)
+        {
+
+            if (EventViewModel != null)
+            {
+                eventId = EventViewModel.EventId;
+                EventName = EventViewModel.Title;
+
+                //buttonDisabled = false;
+            }
+            else
+            {
+                EventName = "Unknown Event";
+                //buttonDisabled = true;
+
+            }
+
+            StateHasChanged();
+            /*
+            _eventViewModel = await editEventService.GetEventForEditAsync(eventId);
+            if (_eventViewModel == null)
+            {
+                errorMessage = "Event not found.";
+                StateHasChanged();
+                return;
+            }
+            */
+
+            // this.insert new ErrorMessageComponent().ErrorMessage = "Event not found.";
+            StateHasChanged();
+        }
+    }
+
+}

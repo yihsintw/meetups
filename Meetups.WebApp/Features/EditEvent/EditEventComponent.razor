@@ -1,7 +1,9 @@
 ﻿@page "/events/edit/{eventid:int}"
+@using Meetups.WebApp.Features.DeleteEvent
 @using Meetups.WebApp.Shared.ViewModels
 @inject NavigationManager NavigationManager
 @inject EditEventService editEventService
+@inject NavigationManager navigationManager
 
 <h3>Edit Event</h3>
 @if (_eventViewModel is not null)
@@ -15,6 +17,9 @@
             <ErrorMessageComponent ErrorMessage="@errorMessage" />
         </ErrorMessageFragment>
     </AddUpdateEventComponent>
+
+    <br/>
+    <DeleteEventComponent ButtonClass="btn btn-primary mt-2" EventViewModel="@_eventViewModel" OnDeleted="OnDeleted" />
 }
 else 
 {
@@ -26,7 +31,11 @@ else
 }
 
 
+@* <ConfirmDialogComponent @ref="confirmDialogComponent" />
+ *@
 @code {
+    //private ConfirmDialogComponent? confirmDialogComponent;
+
     [Parameter]
     public int eventId { get; set; }
     public EventViewModel? _eventViewModel { get; set; }
@@ -45,12 +54,13 @@ else
                 StateHasChanged();
                 return;
             }
-                // this.insert new ErrorMessageComponent().ErrorMessage = "Event not found.";
+            // this.insert new ErrorMessageComponent().ErrorMessage = "Event not found.";
 
-            
+
+
             StateHasChanged();
         }
-        
+
     }
 
     private async Task OnErrorMessageChanged(string message)
@@ -78,7 +88,18 @@ else
         NavigationManager.NavigateTo("/");
 
 
-        
 
+
+    }
+
+    private async Task OnDeleted()
+    {
+        // confirmDialogComponent?.Show("Are you sure you want to delete this event?",
+        // (sender) =>
+        // {
+        //     var aa = sender;
+        // });
+
+        navigationManager.NavigateTo("/");
     }
 }

@@ -21,6 +21,7 @@
                 <th>End Time</th>
                 @* <th>Location</th> *@
                 <th>Capacity</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +48,9 @@
                     <td>@eventItem.EndDate  @eventItem.EndTime</td>
                     @* <td>@eventItem.Location</td> *@
                     <td>@(eventItem.Capacity==0?"Unlimited":eventItem.Capacity.ToString())</td>
+                    <td>
+                        <DeleteEventComponent ButtonClass="btn btn-link" EventViewModel="@eventItem" OnDeleted="OnDeleted" />
+                    </td>
                 </tr>
             }
         </tbody>
@@ -57,6 +61,19 @@
 @code {
     private int totalCount = 0;
     private List<EventViewModel> createdEvents = new();
+
+    private void OnDeleted(int eventId)
+    {
+        if (createdEvents != null)
+        {
+            var deletedEvent = createdEvents.FirstOrDefault(e => e.EventId == eventId);
+            if (deletedEvent != null)
+            {
+                createdEvents.Remove(deletedEvent);
+                StateHasChanged();
+            }
+        }
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {

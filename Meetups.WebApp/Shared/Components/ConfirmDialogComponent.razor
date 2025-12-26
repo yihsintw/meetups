@@ -1,0 +1,52 @@
+﻿@if (showDialog)
+{
+    <div class="modal modal-backdrop show d-block" tabindex="-1" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Hide"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@confirmMessage</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Hide">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="Confirm">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    private bool showDialog = false;
+    private string confirmMessage = string.Empty;
+    Action<string>? onConfirm;
+
+    // You can add parameters and methods to handle confirmation logic here
+    //show /hide dialog, set message, handle confirm/cancel actions, etc.
+    public void Show(string message, Action<string>? onConfirm)
+    {
+        confirmMessage = message;
+        showDialog = true;
+        StateHasChanged();
+        this.onConfirm = onConfirm;
+    }   
+
+    public void Hide()
+    {
+        showDialog = false;
+        confirmMessage = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task Confirm()
+    {
+        // Implement your delete logic here
+        //await Task.Delay(1000); // Simulate async work
+        Hide();
+        onConfirm?.Invoke("ok");
+    }
+
+
+}
