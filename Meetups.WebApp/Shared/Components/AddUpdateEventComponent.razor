@@ -126,7 +126,7 @@
     &nbsp;
     @* <button type="reset" class="btn btn-secondary">Reset</button>
     &nbsp; *@
-    <NavLink class="btn btn-light" href="/">Cancel</NavLink>
+    <NavLink class="btn btn-light" href="/events">Cancel</NavLink>
 
 
 </EditForm>
@@ -163,7 +163,7 @@
         }
 
         //validate file and make sue file size is less than 500kb
-        if (EventViewModel.CoverImage.Size > 500 * 1024)
+        if (EventViewModel.CoverImage.Size > 5000 * 1024)
         {
             errorMessage = "Cover image size should not exceed 5MB.";
             await ErrorMessageChanged.InvokeAsync(errorMessage);

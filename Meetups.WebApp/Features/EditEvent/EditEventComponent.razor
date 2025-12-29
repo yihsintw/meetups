@@ -85,7 +85,7 @@ else
         await editEventService.UpdateEventAsync(_eventViewModel);
 
         // Navigate to the main page after creation
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/events");
 
 
 
@@ -100,6 +100,6 @@ else
         //     var aa = sender;
         // });
 
-        navigationManager.NavigateTo("/");
+        navigationManager.NavigateTo("/events");
     }
 }

@@ -1,0 +1,46 @@
+﻿@inject NavigationManager NavigationManager
+@inject SharedHelper sharedHelper
+
+<div class="d-flex" role="search">
+    <input class="form-control me-2" type="search" 
+    placeholder="Search" aria-label="Search" 
+    @bind-value="searchQuery"
+    @bind-value:event="oninput"
+    @onkeydown="HandleKeyDown"
+    >
+    <button class="@ButtonClass" type="button" @onclick="Search">Search</button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string SearchUrl { get; set; } = "/events";
+    [Parameter]
+    public string ButtonClass { get; set; } = "btn btn-outline-light";
+
+    private string searchQuery = string.Empty;
+
+    override protected void OnInitialized()
+    {
+        var queryParam = sharedHelper.GetQueryParamValue("search");
+        if (!string.IsNullOrEmpty(queryParam))
+        {
+            searchQuery = queryParam;
+        }
+    }
+
+    private void Search() {
+        // search logic here
+        
+        NavigationManager.NavigateTo($"{SearchUrl}?search={Uri.EscapeDataString(searchQuery)}", forceLoad:true);
+
+    }
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        if  (args.Key == "Enter")
+        {
+            Search();
+        }
+    }
+}
+}
