@@ -5,21 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Meetups.WebApp.Features.DiscoverEvents
 {
-    public class DiscoverEventsService
-    {
-        private readonly IDbContextFactory<ApplicationDbContext>? _contextFactory;
-        private readonly IMapper? mapper;
-
-        public DiscoverEventsService()
-        {
-
-        }
-        public DiscoverEventsService(IDbContextFactory<ApplicationDbContext> contextFactory,
+    public class DiscoverEventsService(IDbContextFactory<ApplicationDbContext> _contextFactory,
             IMapper mapper)
-        {
-            _contextFactory = contextFactory;
-            this.mapper = mapper;
-        }
+    {
+        //private readonly IDbContextFactory<ApplicationDbContext>? _contextFactory = contextFactory;
+        //private readonly IMapper? mapper = _mapper;
+
+        
 
         public async Task<List<EventViewModel>> GetEventsAsync(string? filter = "")
         {

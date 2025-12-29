@@ -1,4 +1,4 @@
-﻿@page "/events/edit/{eventid:int}"
+﻿@page "/org/events/edit/{eventid:int}"
 @using Meetups.WebApp.Features.DeleteEvent
 @using Meetups.WebApp.Shared.ViewModels
 @inject NavigationManager NavigationManager
@@ -85,7 +85,7 @@ else
         await editEventService.UpdateEventAsync(_eventViewModel);
 
         // Navigate to the main page after creation
-        NavigationManager.NavigateTo("/events");
+        NavigationManager.NavigateTo("/org/events");
 
 
 
@@ -100,6 +100,6 @@ else
         //     var aa = sender;
         // });
 
-        navigationManager.NavigateTo("/events");
+        navigationManager.NavigateTo("/org/events");
     }
 }

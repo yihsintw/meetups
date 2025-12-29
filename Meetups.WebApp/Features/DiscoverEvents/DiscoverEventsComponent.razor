@@ -16,15 +16,15 @@
                     var imageUrl = eventItem.ImageUrl ?? "/images/placeholder.png";
 
                 <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-                    <a href="#" class="text-decoration-none">
+                    <a href="/org/events/@eventItem.EventId" class="text-decoration-none">
                         <div class="card border-0">
                             <img src="@imageUrl" class="card-img-top rounded-3" 
                             alt="@eventItem.Title" />
                             <p class="mt-1 mb-0 text-muted">@($"{eventItem.BeginDate:MMM d(ddd)}") - @eventItem.BeginTime.ToString("HH:hh")</p>
                             <p class="card-title fw-bold">@eventItem.Title</p>
                             
-                            <p class="card-text">@eventItem.Description</p>
-                            
+                            @* <p class="card-text">@eventItem.Description</p>
+                             *@
                             
                             @* <div class="card-body">
                                 <h5 class="card-title">@eventItem.Title</h5>

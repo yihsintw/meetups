@@ -9,7 +9,7 @@ namespace Meetups.WebApp.Shared.ViewModels
         [Required]
         [StringLength(maximumLength:100)]
         public string? Title { get; set; }
-        [StringLength(maximumLength:500)]
+        [StringLength(maximumLength:4000)]
         public string? Description { get; set; }
         [Required]
         public DateOnly BeginDate { get; set; }

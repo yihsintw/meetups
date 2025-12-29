@@ -1,7 +1,295 @@
-﻿@page "/events/view/{EventId:int}"
+﻿@page "/org/events/{id:int}"
+@using Meetups.WebApp.Shared.ViewModels
+@inject ViewEventService ViewEventService;
 
-<h2>View Event</h2>
+@if (_event is not null)
+{
+    <div class="event-container">
+        <!-- Hero Section with Cover Image -->
+        <h2 class="event-title">@_event.Title</h2>
+        <hr />
+        <div class="event-hero">
+            <img src="@_event.ImageUrl" alt="@_event.Title" class="event-cover-image" />
+        </div>
+        <!-- Description Section -->
+        <div class="event-description">
+            <h2>Details</h2>
+            <div class="description-content">
+                @if (!string.IsNullOrWhiteSpace(_event.Description))
+                {
+                    @((MarkupString)_event.Description.Replace("\n", "<br/>"))
+                }
+                else
+                {
+                    <p>No description available.</p>
+                }
+            </div>
+        </div>
+
+
+        <div class="event-details">
+            
+            <!-- Online Link -->
+            @* @if (!string.IsNullOrWhiteSpace(_event.MeetupLink))
+            {
+                <div class="detail-item">
+                    <div class="detail-icon">🔗</div>
+                    <div class="detail-content">
+                        <a href="@_event.MeetupLink" target="_blank">Join Online</a>
+                    </div>
+                </div>
+            } *@
+
+            <!-- Capacity -->
+           @*  @if (_event.Capacity > 0)
+            {
+                <div class="detail-item">
+                    <div class="detail-icon">👥</div>
+                    <div class="detail-content">
+                        <strong>Capacity: @_event.Capacity attendees</strong>
+                    </div>
+                </div>
+            } *@
+        </div>
+
+
+
+        <!-- Event Header -->
+        @* <div class="event-header">
+            <h1 class="event-title">@_event.Title</h1>
+            
+            <!-- Host Info -->
+            <div class="event-host">
+                <span>Hosted by Organizer</span>
+            </div>
+
+            <!-- Group Info (if applicable) -->
+            <div class="event-group">
+                <h3>@_event.Category Events</h3>
+            </div>
+        </div> *@
+
+        <!-- Event Details Section -->
+        @* <div class="event-details">
+            <!-- Date and Time -->
+            <div class="detail-item">
+                <div class="detail-icon">📅</div>
+                <div class="detail-content">
+                    <strong>@FormatEventDate()</strong>
+                    <div class="detail-time">@FormatEventTime()</div>
+                </div>
+            </div>
+
+            <!-- Location -->
+            @if (!string.IsNullOrWhiteSpace(_event.Location))
+            {
+                <div class="detail-item">
+                    <div class="detail-icon">📍</div>
+                    <div class="detail-content">
+                        <strong>@_event.Location</strong>
+                    </div>
+                </div>
+            }
+
+            <!-- Online Link -->
+            @if (!string.IsNullOrWhiteSpace(_event.MeetupLink))
+            {
+                <div class="detail-item">
+                    <div class="detail-icon">🔗</div>
+                    <div class="detail-content">
+                        <a href="@_event.MeetupLink" target="_blank">Join Online</a>
+                    </div>
+                </div>
+            }
+
+            <!-- Capacity -->
+            @if (_event.Capacity > 0)
+            {
+                <div class="detail-item">
+                    <div class="detail-icon">👥</div>
+                    <div class="detail-content">
+                        <strong>Capacity: @_event.Capacity attendees</strong>
+                    </div>
+                </div>
+            }
+        </div> *@
+
+        <!-- Description Section -->
+        @* <div class="event-description">
+            <h2>Details</h2>
+            <div class="description-content">
+                @if (!string.IsNullOrWhiteSpace(_event.Description))
+                {
+                    @((MarkupString)_event.Description.Replace("\n", "<br/>"))
+                }
+                else
+                {
+                    <p>No description available.</p>
+                }
+            </div>
+        </div> *@
+    </div>
+}
+else
+{
+    <div class="loading">
+        <p>Loading event details...</p>
+    </div>
+}
+
+<style>
+    .event-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .event-hero {
+        width: 100%;
+        height: 400px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .event-cover-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .event-header {
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .event-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .event-host {
+        margin-bottom: 1rem;
+        color: #666;
+    }
+
+    .event-group h3 {
+        font-size: 1.1rem;
+        color: #00798a;
+        margin: 0.5rem 0;
+    }
+
+    .event-details {
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .detail-icon {
+        font-size: 2rem;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .detail-content {
+        flex: 1;
+    }
+
+    .detail-content strong {
+        display: block;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-time {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .detail-content a {
+        color: #00798a;
+        text-decoration: none;
+    }
+
+    .detail-content a:hover {
+        text-decoration: underline;
+    }
+
+    .event-description {
+        padding: 0 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .event-description h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .description-content {
+        line-height: 1.6;
+        color: #333;
+        white-space: pre-wrap;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    @@media (max-width: 768px) {
+        .event-title {
+            font-size: 1.5rem;
+        }
+
+        .event-hero {
+            height: 250px;
+        }
+    }
+</style>
 
 @code {
+    [Parameter]
+    public int id { get; set; }
 
+    public EventViewModel? _event { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _event = await ViewEventService.GetEventByIdAsync(id);
+    }
+
+    private string FormatEventDate()
+    {
+        if (_event == null) return string.Empty;
+        
+        var begin = _event.BeginDate.ToDateTime(_event.BeginTime);
+        var end = _event.EndDate.ToDateTime(_event.EndTime);
+        
+        if (_event.BeginDate == _event.EndDate)
+        {
+            return begin.ToString("dddd, MMM dd");
+        }
+        
+        return $"{begin:dddd, MMM dd} to {end:dddd, MMM dd}";
+    }
+
+    private string FormatEventTime()
+    {
+        if (_event == null) return string.Empty;
+        
+        var begin = _event.BeginTime.ToString("h:mm tt");
+        var end = _event.EndTime.ToString("h:mm tt");
+        
+        return $"{begin} to {end}";
+    }
 }

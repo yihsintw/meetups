@@ -1,4 +1,4 @@
-﻿@page "/events"
+﻿@page "/org/events"
 @using Meetups.WebApp.Features.CreateEvent
 @using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Components.Authorization
@@ -29,7 +29,7 @@
             {
                 <tr>
                     <td style="text-align:center">
-                        <a href="/events/edit/@eventItem.EventId" class="btn btn-primary">
+                        <a href="/org/events/edit/@eventItem.EventId" class="btn btn-primary">
                             @{
                                 var imageUrl = string.IsNullOrEmpty(eventItem.ImageUrl) ? "/images/placeholder.png" : eventItem.ImageUrl;
                                 if (!string.IsNullOrEmpty(imageUrl))
@@ -57,7 +57,7 @@
     </table>
 }
 @* <button class="btn btn-primary" @onclick="CreateEvent">Create Event</button> *@
-<a href="/events/create" class="btn btn-primary">Create New Meetup</a>
+<a href="/org/events/create" class="btn btn-primary">Create New Meetup</a>
 @code {
     private int totalCount = 0;
     private List<EventViewModel> createdEvents = new();

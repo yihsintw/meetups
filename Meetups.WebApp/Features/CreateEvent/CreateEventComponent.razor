@@ -1,4 +1,4 @@
-﻿@page "/events/create"
+﻿@page "/org/events/create"
 @using Meetups.WebApp.Shared.ViewModels
 @using Meetups.WebApp.Shared
 @using SixLabors.ImageSharp.Processing
@@ -47,7 +47,7 @@
         await createEventService.CreateEventAsync(_eventViewModel);
 
         // Navigate to the main page after creation
-        NavigationManager.NavigateTo("/events");
+        NavigationManager.NavigateTo("/org/events");
 
 
         /*
