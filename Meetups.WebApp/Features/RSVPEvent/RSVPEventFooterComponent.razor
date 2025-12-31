@@ -1,0 +1,16 @@
+﻿@using Meetups.WebApp.Shared.ViewModels
+if(_event is not null)
+{
+    <footer class="container-fluid bg-dark text-white py-2 position-fixed bottom-0 w-100">
+        <strong class="card-title fw-bold">&copy; 2023 Meetups. All rights reserved.</strong>
+
+        <p class="mt-1 mb-0 text-white">@($"{_event?.BeginDate:MMM d(ddd)}") - @_event?.BeginTime.ToString("HH:hh")</p>
+        <p class="card-title fw-bold">@_event?.Title</p>
+    </footer>
+}
+
+@code {
+
+    [Parameter]
+    public EventViewModel? _event { get; set; }
+}

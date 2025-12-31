@@ -7,8 +7,11 @@ using Meetups.WebApp.Features.EditEvent;
 using Meetups.WebApp.Features.DeleteEvent;
 using Meetups.WebApp.Features.DiscoverEvents;
 using Meetups.WebApp.Features.ViewEvent;
+using Meetups.WebApp.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<LayoutService>();
 
 builder.Services.AddTransient<SharedHelper>();
 builder.Services.AddTransient<CreateEventService>();

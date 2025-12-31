@@ -1,6 +1,8 @@
-﻿@page "/org/events/{id:int}"
+﻿@page "/events/{id:int}"
+@using Meetups.WebApp.Features.RSVPEvent
 @using Meetups.WebApp.Shared.ViewModels
 @inject ViewEventService ViewEventService;
+@inject LayoutService LayoutService
 
 @if (_event is not null)
 {
@@ -26,108 +28,7 @@
             </div>
         </div>
 
-
-        <div class="event-details">
-            
-            <!-- Online Link -->
-            @* @if (!string.IsNullOrWhiteSpace(_event.MeetupLink))
-            {
-                <div class="detail-item">
-                    <div class="detail-icon">🔗</div>
-                    <div class="detail-content">
-                        <a href="@_event.MeetupLink" target="_blank">Join Online</a>
-                    </div>
-                </div>
-            } *@
-
-            <!-- Capacity -->
-           @*  @if (_event.Capacity > 0)
-            {
-                <div class="detail-item">
-                    <div class="detail-icon">👥</div>
-                    <div class="detail-content">
-                        <strong>Capacity: @_event.Capacity attendees</strong>
-                    </div>
-                </div>
-            } *@
-        </div>
-
-
-
-        <!-- Event Header -->
-        @* <div class="event-header">
-            <h1 class="event-title">@_event.Title</h1>
-            
-            <!-- Host Info -->
-            <div class="event-host">
-                <span>Hosted by Organizer</span>
-            </div>
-
-            <!-- Group Info (if applicable) -->
-            <div class="event-group">
-                <h3>@_event.Category Events</h3>
-            </div>
-        </div> *@
-
-        <!-- Event Details Section -->
-        @* <div class="event-details">
-            <!-- Date and Time -->
-            <div class="detail-item">
-                <div class="detail-icon">📅</div>
-                <div class="detail-content">
-                    <strong>@FormatEventDate()</strong>
-                    <div class="detail-time">@FormatEventTime()</div>
-                </div>
-            </div>
-
-            <!-- Location -->
-            @if (!string.IsNullOrWhiteSpace(_event.Location))
-            {
-                <div class="detail-item">
-                    <div class="detail-icon">📍</div>
-                    <div class="detail-content">
-                        <strong>@_event.Location</strong>
-                    </div>
-                </div>
-            }
-
-            <!-- Online Link -->
-            @if (!string.IsNullOrWhiteSpace(_event.MeetupLink))
-            {
-                <div class="detail-item">
-                    <div class="detail-icon">🔗</div>
-                    <div class="detail-content">
-                        <a href="@_event.MeetupLink" target="_blank">Join Online</a>
-                    </div>
-                </div>
-            }
-
-            <!-- Capacity -->
-            @if (_event.Capacity > 0)
-            {
-                <div class="detail-item">
-                    <div class="detail-icon">👥</div>
-                    <div class="detail-content">
-                        <strong>Capacity: @_event.Capacity attendees</strong>
-                    </div>
-                </div>
-            }
-        </div> *@
-
-        <!-- Description Section -->
-        @* <div class="event-description">
-            <h2>Details</h2>
-            <div class="description-content">
-                @if (!string.IsNullOrWhiteSpace(_event.Description))
-                {
-                    @((MarkupString)_event.Description.Replace("\n", "<br/>"))
-                }
-                else
-                {
-                    <p>No description available.</p>
-                }
-            </div>
-        </div> *@
+       
     </div>
 }
 else
@@ -226,8 +127,7 @@ else
     }
 
     .event-description {
-        padding: 0 1rem;
-        margin-bottom: 2rem;
+        padding-bottom: 60px;
     }
 
     .event-description h2 {
@@ -265,7 +165,12 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        _event = await ViewEventService.GetEventByIdAsync(id);
+         _event = await ViewEventService.GetEventByIdAsync(id);
+        //StateHasChanged();
+
+        LayoutService.SetSectionContent(
+            @<RSVPEventFooterComponent _event="_event" />   
+        );
     }
 
     private string FormatEventDate()

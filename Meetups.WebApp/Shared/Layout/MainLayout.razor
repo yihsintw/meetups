@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject LayoutService LayoutService
+@implements IDisposable
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
     <div class="container-fluid">
@@ -34,6 +36,19 @@
     @Body
 </main>
 
+<div>
+    @LayoutService.SectionContent
+</div>
+
+@* <footer class="container-fluid bg-dark text-white py-2 position-fixed bottom-0 w-100">
+    <strong class="mt-0 mb-1">Location:</strong> 
+    <br/><strong class="card-title fw-bold">&copy; 2023 Meetups. All rights reserved.</strong>
+
+</footer>
+ *@
+
+
+
 @* <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -55,3 +70,28 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+
+    //OnAfterRender()
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            LayoutService.OnSectionContentChanged += UpdateLayoutAsync;
+        }
+        //LayoutService.OnSectionContentChanged += UpdateLayoutAsync;
+        //LayoutService.SetSectionContent(null);
+    }
+
+    public async void UpdateLayoutAsync()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    public void Dispose()
+    {
+        LayoutService.OnSectionContentChanged -= UpdateLayoutAsync;
+    }
+}
+

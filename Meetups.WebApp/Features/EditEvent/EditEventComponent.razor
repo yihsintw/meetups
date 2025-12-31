@@ -1,6 +1,8 @@
 ﻿@page "/org/events/edit/{eventid:int}"
 @using Meetups.WebApp.Features.DeleteEvent
 @using Meetups.WebApp.Shared.ViewModels
+@inherits BaseComponent
+
 @inject NavigationManager NavigationManager
 @inject EditEventService editEventService
 @inject NavigationManager navigationManager
