@@ -20,7 +20,7 @@ builder.Services.AddTransient<DeleteEventService>();
 builder.Services.AddTransient<ViewCreatedEventsService>();
 builder.Services.AddTransient<DiscoverEventsService>();
 builder.Services.AddTransient<ViewEventService>();
-
+    
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

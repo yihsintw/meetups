@@ -1,0 +1,57 @@
+﻿@if (showDialog)
+{
+    <div class="modal fade modal-backdrop show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @DialogContent
+                </div>
+                
+            </div>
+        </div>
+    </div>
+}
+@code {
+    private bool showDialog = false;
+    private string confirmMessage = string.Empty;
+    Action<string>? onConfirm;
+
+    [Parameter]
+    public string? Title { get; set; } = "Sign up to attend this event";
+    [Parameter]
+    public RenderFragment? DialogContent { get; set; } = default!;
+
+    // You can add parameters and methods to handle confirmation logic here
+    //show /hide dialog, set message, handle confirm/cancel actions, etc.
+    public void Show()
+    {
+        showDialog = true;
+        StateHasChanged();
+    }   
+
+    public void Close()
+    {
+        showDialog = false;
+        StateHasChanged();
+    }
+
+
+
+
+}
+
+<style>
+.modal-backdrop.show {
+    opacity: 0.7;
+    background-color: #000;
+}
+
+    .modal-content {
+        background-color: #fff;
+        opacity: 1;
+}
+</style>
