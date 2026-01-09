@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthenticationSchemeProvider AuthenticationSchemeProvider
+
+<div class="container">
+    @if (externalLoginProviders is not null)
+    {
+        foreach (var provider in externalLoginProviders)
+        {
+            if (!string.IsNullOrEmpty(provider.DisplayName))
+            {
+                <div>
+                    <button type="button" class="btn btn-primary" @onclick="() => LoginWithExternalProvider(provider.Name)">
+                        Login with @provider.DisplayName
+                    </button>
+
+                </div>
+            }
+
+
+        }
+    }
+
+
+</div>
+@code {
+    //private AuthenticationState? authState;
+    private IEnumerable<AuthenticationScheme>? externalLoginProviders;
+    
+    //Login with external provider
+    private void LoginWithExternalProvider(string providerName)
+    {
+       
+        NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        externalLoginProviders = await AuthenticationSchemeProvider.GetAllSchemesAsync();
+
+
+    }
+
+}

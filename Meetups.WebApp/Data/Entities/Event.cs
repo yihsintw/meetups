@@ -29,5 +29,7 @@ namespace Meetups.WebApp.Data.Entities
         public string? ImageUrl { get; set; }
         public int OrganizerId { get; set; }
 
+        public List<RSVP>? RSVPs { get; set; } = [];
+
     }
 }

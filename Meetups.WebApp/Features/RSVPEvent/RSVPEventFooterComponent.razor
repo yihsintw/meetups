@@ -1,4 +1,11 @@
 ﻿@using Meetups.WebApp.Shared.ViewModels
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IAuthenticationSchemeProvider AuthenticationSchemeProvider
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 if(_event is not null)
 {
 <footer class="container-fluid bg-dark text-white py-2 position-fixed bottom-0 w-100">
@@ -16,19 +23,68 @@ if(_event is not null)
 
 <DialogComponent @ref="dialog" Title="Sign up to attend this event">
     <DialogContent>
-        <p>Are you sure you want to RSVP for this event?</p>
-        
+        <ExternalLoginButtonComponent />
     </DialogContent>
 </DialogComponent>
+
+<ConfirmDialogComponent @ref="confirmDialog" />
+
 @code {
     [Parameter]
-    public EventViewModel? _event { get; set; }
+    public EventViewModel? _event { get; set; } 
 
     private DialogComponent dialog = default!;
 
+    private ConfirmDialogComponent confirmDialog = default!;
+
+    private AuthenticationState? authState;
+
+    //private IEnumerable<AuthenticationScheme>? externalLoginProviders;
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+    }
+    //Login with external provider
+    private void LoginWithExternalProvider(string providerName)
+    {
+        /*var redirectUrl = "signin-callback";
+        NavigationManager.NavigateTo($"/authentication/{providerName}/?redirectUrl={redirectUrl}", forceLoad:true);
+        */
+                NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+
+    }
+
+
+
     private void Attend()
     {
-        dialog.Show();
+        if ((authState?.User?.Identity?.IsAuthenticated ?? false) == false)
+        {
+            // User is authenticated
+            dialog.Show();
+            //, navigate to event details or RSVP page
+            // NavigationManager.NavigateTo($"/events/{_event?.Id}/rsvp");
+            // return;
+        }
+        else
+        {
+            // User is not authenticated
+            confirmDialog.Show("Areyou sure you want to RSVP for this event?", (msg) =>
+        {
+            if (msg=="ok")
+            {
+                //NavigationManager.NavigateTo($"/signout");
+            }
+        });
+        }
+
+       
     }
+
+    //override async Task OnInitializedAsync()
+    
+
+
 
 }

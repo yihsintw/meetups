@@ -8,6 +8,11 @@ using Meetups.WebApp.Features.DeleteEvent;
 using Meetups.WebApp.Features.DiscoverEvents;
 using Meetups.WebApp.Features.ViewEvent;
 using Meetups.WebApp.Shared.Services;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Identity.Client;
+using Meetups.WebApp.Shared.EndPoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +43,21 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+//configure google authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Google:ClientId"] ?? string.Empty;
+        options.ClientSecret = builder.Configuration["Google:ClientSecret"] ??  string.Empty;
+    });
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,7 +71,14 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+//Google authentication
+app.UseAuthentication();
+
 app.MapStaticAssets();
+
+//Authentication Endpoints
+app.MapAuthenticationEndPoints();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

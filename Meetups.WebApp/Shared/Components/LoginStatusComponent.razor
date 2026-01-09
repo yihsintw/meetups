@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<ul class="navbar-nav ms-auto">    
+    @if(isAuthenticated)
+    {
+        <li class="nav-item">
+            <span class="nav-link text-light">Hello, @userName</span>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-light btn btn-link" @onclick="Logout">Logout</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-light btn btn-link" @onclick="Login">Login</a>
+        </li>
+    }
+    
+</ul>
+
+<DialogComponent @ref="loginDialog" Title="Login">
+    <DialogContent>
+        <ExternalLoginButtonComponent />
+    </DialogContent>
+</DialogComponent>
+
+@code {
+
+    private DialogComponent loginDialog = default!;
+
+    private AuthenticationState? authState;
+    private bool isAuthenticated = false;
+    private string? userName = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+        // You can add additional logic here to handle user roles, claims, etc.
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        if (isAuthenticated)
+        {
+            userName = user.Identity?.Name;
+        }
+
+    }
+    private void Logout(MouseEventArgs args)
+    {
+        if (isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/signout", forceLoad: true);
+        }
+    }
+    private void Login(MouseEventArgs args)
+    {
+        if (!isAuthenticated)
+        {
+            loginDialog.Show();
+        }
+        
+    }
+}
