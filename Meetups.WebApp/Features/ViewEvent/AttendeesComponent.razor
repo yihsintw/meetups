@@ -1,0 +1,24 @@
+﻿@using Meetups.WebApp.Data.Entities
+
+@if (Users is null || !Users.Any())
+{
+    <p>No attendees yet.</p>
+}
+else
+{
+        @foreach (var user in Users)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                <div class="card border-0">
+                    <p class="card-title fw-bold">@user.Name</p>        
+                </div>
+            </div>
+            
+        }
+    
+}
+
+@code {
+    [Parameter]
+    public List<User>? Users { get; set; }
+}

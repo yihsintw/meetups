@@ -1,10 +1,13 @@
 ﻿@using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 
 @inject IAuthenticationSchemeProvider AuthenticationSchemeProvider
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RSVPEventService RSVPEventService;
+
 
 if(_event is not null)
 {
@@ -14,7 +17,10 @@ if(_event is not null)
             <p class="mt-1 mb-0 text-white">@($"{_event?.BeginDate:MMM d(ddd)}") - @_event?.BeginTime.ToString("HH:hh")</p>
             <p class="card-title fw-bold">@_event?.Title</p>
         </div>
-        <div>
+        <div style="color:red;font-weight:bold">
+            @errorMessage
+        </div>
+        <div class="ms-3">
             <button class="btn btn-outline-light" @onclick="Attend">Attend</button>
         </div>
     </div>
@@ -30,6 +36,7 @@ if(_event is not null)
 <ConfirmDialogComponent @ref="confirmDialog" />
 
 @code {
+    private string errorMessage = string.Empty;
     [Parameter]
     public EventViewModel? _event { get; set; } 
 
@@ -70,11 +77,27 @@ if(_event is not null)
         else
         {
             // User is not authenticated
-            confirmDialog.Show("Areyou sure you want to RSVP for this event?", (msg) =>
+            confirmDialog.Show("Are you sure you want to RSVP for this event?", async (msg) =>
         {
             if (msg=="ok")
             {
                 //NavigationManager.NavigateTo($"/signout");
+                
+                var email = authState?.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+                var eventId = _event!.EventId;
+                bool result = await RSVPEventService.RSVPToEventAsync(eventId, email??"");
+                errorMessage = string.Empty;
+                //result = false; // For testing error message display
+                if (result)
+                {
+                    NavigationManager.NavigateTo($"/events/{eventId}");
+                }
+                else
+                {
+                    errorMessage = "Error occurred while trying to RSVP. Please try again later.";
+                    StateHasChanged();
+                }
+
             }
         });
         }

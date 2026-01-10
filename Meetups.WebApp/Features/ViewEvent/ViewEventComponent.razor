@@ -1,4 +1,5 @@
 ﻿@page "/events/{id:int}"
+@using Meetups.WebApp.Data.Entities
 @using Meetups.WebApp.Features.RSVPEvent
 @using Meetups.WebApp.Shared.ViewModels
 @inject ViewEventService ViewEventService;
@@ -15,17 +16,25 @@
         </div>
         <!-- Description Section -->
         <div class="event-description">
-            <h2>Details</h2>
-            <div class="description-content">
+            <h6>Details</h6>
+            <div class="description-content" style="padding-bottom:60px">
+
                 @if (!string.IsNullOrWhiteSpace(_event.Description))
                 {
-                    @((MarkupString)_event.Description.Replace("\n", "<br/>"))
+                    <pre style="white-space: pre-wrap; word-wrap:break-word">
+                        @((MarkupString)_event.Description.Replace("\n", "<br/>"))
+                    </pre>
                 }
                 else
                 {
                     <p>No description available.</p>
                 }
+
             </div>
+
+            <br/>
+            <h6>Attendees</h6>
+            <AttendeesComponent Users="_users" />
         </div>
 
        
@@ -157,6 +166,9 @@ else
 </style>
 
 @code {
+
+    private List<User>? _users = new();
+
     [Parameter]
     public int id { get; set; }
 
@@ -165,6 +177,8 @@ else
     protected override async Task OnParametersSetAsync()
     {
          _event = await ViewEventService.GetEventByIdAsync(id);
+
+        _users = await ViewEventService.GetAttendeesByEventIdAsync(id);
         //StateHasChanged();
 
         LayoutService.SetSectionContent(

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Identity.Client;
 using Meetups.WebApp.Shared.EndPoints;
+using Meetups.WebApp.Features.RSVPEvent;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,8 @@ builder.Services.AddTransient<DeleteEventService>();
 builder.Services.AddTransient<ViewCreatedEventsService>();
 builder.Services.AddTransient<DiscoverEventsService>();
 builder.Services.AddTransient<ViewEventService>();
-    
+builder.Services.AddTransient<RSVPEventService>();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

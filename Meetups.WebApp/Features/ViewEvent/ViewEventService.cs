@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Meetups.WebApp.Data;
+using Meetups.WebApp.Data.Entities;
 using Meetups.WebApp.Shared.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,18 @@ namespace Meetups.WebApp.Features.ViewEvent
             var eventViewModel = mapper!.Map<EventViewModel>(existingEvent);
             return eventViewModel;
 
+
+        }
+
+        public async Task<List<User>> GetAttendeesByEventIdAsync(int id)
+        {
+            using var context = _contextFactory!.CreateDbContext();
+            var attendees = await context.RSVPs
+                .Where(r => r.EventId == id)
+                .Include(r => r.User)
+                .Select(r => r.User!)
+                .ToListAsync();
+            return attendees;
 
         }
     }
