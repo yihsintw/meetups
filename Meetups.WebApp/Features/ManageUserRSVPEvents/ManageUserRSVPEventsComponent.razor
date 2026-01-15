@@ -1,0 +1,70 @@
+﻿@page "/users/{userId:int}/manage-rsvp-events"
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<div class="container my-4">
+    <h2>Upcoming Events</h2>
+
+    <!-- Order -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Image -->
+                <div class="col-12 col-md-2 text-center">
+                    <img src="https://via.placeholder.com/120"
+                         class="img-fluid border"
+                         alt="Product">
+                </div>
+
+                <!-- Details -->
+                <div class="col-12 col-md-7">
+                    <h6 class="fw-bold mb-1">
+                        Apple AirPods Pro (2nd Generation)
+                    </h6>
+                    <div class="text-muted small mb-1">
+                        Order #113-2456789-1234567
+                    </div>
+                    <div class="small mb-2">
+                        Delivered Jan 10, 2026
+                    </div>
+                    <div class="small">
+                        Active Noise Cancellation · MagSafe Charging Case · USB-C
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-12 col-md-3">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-warning btn-sm">
+                            Buy it again
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            View item
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            Track package
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+}

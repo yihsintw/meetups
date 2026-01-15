@@ -7,7 +7,8 @@
 
 @if (_event is not null)
 {
-    <div>
+    <div style="padding-bottom:80px">
+
         <!-- Hero Section with Cover Image -->
         <h2 class="event-title">@_event.Title</h2>
         <hr />
@@ -17,27 +18,25 @@
         <!-- Description Section -->
         <div class="event-description">
             <h6>Details</h6>
-            <div class="description-content" style="padding-bottom:60px">
 
-                @if (!string.IsNullOrWhiteSpace(_event.Description))
-                {
-                    <pre style="white-space: pre-wrap; word-wrap:break-word">
-                        @((MarkupString)_event.Description.Replace("\n", "<br/>"))
-                    </pre>
-                }
-                else
-                {
-                    <p>No description available.</p>
-                }
 
-            </div>
+            @if (!string.IsNullOrWhiteSpace(_event.Description))
+            {
+                <pre style="white-space: pre-wrap; word-wrap:break-word">
+                                        @((MarkupString)_event.Description)
+                                    </pre>
+            }
+            else
+            {
+                <p>No description available.</p>
+            }
 
-            <br/>
             <h6>Attendees</h6>
             <AttendeesComponent Users="_users" />
         </div>
 
-       
+
+
     </div>
 }
 else

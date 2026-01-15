@@ -90,7 +90,7 @@ if(_event is not null)
                 //result = false; // For testing error message display
                 if (result)
                 {
-                    NavigationManager.NavigateTo($"/events/{eventId}");
+                    NavigationManager.NavigateTo($"/events/{eventId}",forceLoad:true);
                 }
                 else
                 {

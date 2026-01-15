@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Identity.Client;
 using Meetups.WebApp.Shared.EndPoints;
 using Meetups.WebApp.Features.RSVPEvent;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +58,26 @@ builder.Services.AddAuthentication(options =>
     .AddGoogle(options =>
     {
         options.ClientId = builder.Configuration["Google:ClientId"] ?? string.Empty;
-        options.ClientSecret = builder.Configuration["Google:ClientSecret"] ??  string.Empty;
+        options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? string.Empty;
+        
+        options.Events = new OAuthEvents
+        {
+            //設定取得使用者的哪些資訊,例如: email, profile等及導向的callback至/sigin-callback
+            //receive ticket after successful authentication
+            OnTicketReceived = async context =>
+            {
+                if (context.Principal != null)
+                {
+                    //sign in the user with cookie authentication
+                    //在這時候還沒有簽cookie,所以要自己簽
+                    await context.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.Principal);
+                    //然後redirect回應用程式
+                    context.Response.Redirect("/signin-callback");
+                    //為了避免後續的處理,要告訴系統這個request(如後續會建立Cookie等)已經處理完了,
+                    context.HandleResponse(); // Prevent further processing
+                }
+            },
+        };
     });
 
 
@@ -75,6 +96,7 @@ app.UseAntiforgery();
 
 //Google authentication
 app.UseAuthentication();
+app.UseAuthorization(); // Add this line to enable authorization middleware
 
 app.MapStaticAssets();
 

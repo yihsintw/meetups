@@ -28,15 +28,24 @@ namespace Meetups.WebApp.Shared.EndPoints
             app.MapGet("/signin-callback",
             async (HttpContext context,IDbContextFactory<ApplicationDbContext> contextFactory) =>
             {
+
+                //不需要重新驗證,因為已經在外部Provider驗證過
+                /*
                 var authenticateResult = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
                 {
                     context.Response.Redirect("/");
                     return;
                 }
+                */
+                if (context.User is null || context.User.Identity is null || !context.User.Identity.IsAuthenticated)
+                {
+                    context.Response.Redirect("/");
+                    return;
+                }
 
                 //取得使用者資訊,例如: Name, Email等,可以根據需求進行處理並寫入資料庫
-                var claims = authenticateResult.Principal.Claims;
+                var claims = context.User.Claims;
                 var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
                 var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var phoneNumber = claims.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone)?.Value; 
@@ -72,9 +81,10 @@ namespace Meetups.WebApp.Shared.EndPoints
                     return;
                 }
 
-
+                //無需再次寫入Cookie，因為外部Nuget Package(Provider)已經處理過
                 //將登入資訊寫入Cookie
-                await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, authenticateResult.Principal);
+                //await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.User);
+
                 //登入成功後的邏輯
                 context.Response.Redirect("/");
             });
