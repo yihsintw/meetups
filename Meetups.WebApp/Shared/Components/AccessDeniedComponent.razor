@@ -1,0 +1,39 @@
+﻿@page "/account/accessdenied"
+
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center">
+
+        <h1 class="display-4 fw-bold text-danger mb-3">
+            Access Denied
+        </h1>
+
+        <p class="text-muted mb-4">
+            You do not have permission to view this page.
+        </p>
+
+        <div>
+            <img src="/images/access-denied.png" alt="Access Denied" class="img-fluid" style="max-width:300px;" />
+        </div>
+        <p/>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="/" class="btn btn-primary">
+                Go to Home
+            </a>
+
+            <button class="btn btn-outline-secondary" @onclick="GoBack">
+                Go Back
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

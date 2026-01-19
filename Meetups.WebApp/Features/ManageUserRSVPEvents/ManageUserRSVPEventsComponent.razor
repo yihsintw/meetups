@@ -1,57 +1,145 @@
 ﻿@page "/users/{userId:int}/manage-rsvp-events"
+@using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Authorization
+@inherits  BaseComponent
 
-@attribute [Authorize]
+@attribute [Authorize(policy:"SameUserPolicy")]
+
+@inject ManageUserRSVPEventsService ManageUserRSVPEventsService;
 
 <div class="container my-4">
     <h2>Upcoming Events</h2>
+    @if (upcomingEvents is not null && upcomingEvents.Count > 0)
+    {
+        foreach (var evt in upcomingEvents)
+        {
+            <!-- Order -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row g-3">
 
-    <!-- Order -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="row g-3">
+                        <!-- Image -->
+                        
+                            <div class="col-12 col-md-2 text-center">
+                            <a href="/events/@evt.EventId">
+                                @{
+                                    var imageUrl = evt.ImageUrl ?? "/images/placeholder.png";
+                                }
+                                <img src="@imageUrl"
+                                     class="img-fluid border img-thumbnail rounded"
+                                     alt="Product" style="width:150px;height:auto;object-fit:cover">
+                        </a>
+                                 </div>
+                        
+                        <!-- Details -->
+                        <div class="col-12 col-md-7">
+                            <a class="text-decoration-none text-dark" href="/events/@evt.EventId">
+                                <h6 class="fw-bold mb-1">
+                                    @evt.Title
+                                </h6>
+                            </a>
+                            <div class="text-muted small mb-1">
+                                <p class="mt-1 mb-0 text-muted">@($"{evt.BeginDate:MMM d(ddd)}") - @evt.BeginTime.ToString("HH:hh")</p>
+                            </div>
+                            @* <div class="small mb-2">
+                                @($"{evt.BeginDate:MMM d(ddd)}") - @evt.BeginTime.ToString("HH:hh")
+                            </div> *@
+                            @* <div class="small">
+                                Active Noise Cancellation · MagSafe Charging Case · USB-C
+                            </div> *@
+                        </div>
 
-                <!-- Image -->
-                <div class="col-12 col-md-2 text-center">
-                    <img src="https://via.placeholder.com/120"
-                         class="img-fluid border"
-                         alt="Product">
+                        <!-- Actions -->
+                        <div class="col-12 col-md-3 ">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning btn-sm">
+                                    Cancel RSVP
+                                </button>
+                                @* <button class="btn btn-outline-secondary btn-sm">
+                                    View item
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    Track package
+                                </button> *@
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-
-                <!-- Details -->
-                <div class="col-12 col-md-7">
-                    <h6 class="fw-bold mb-1">
-                        Apple AirPods Pro (2nd Generation)
-                    </h6>
-                    <div class="text-muted small mb-1">
-                        Order #113-2456789-1234567
-                    </div>
-                    <div class="small mb-2">
-                        Delivered Jan 10, 2026
-                    </div>
-                    <div class="small">
-                        Active Noise Cancellation · MagSafe Charging Case · USB-C
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="col-12 col-md-3">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-warning btn-sm">
-                            Buy it again
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            View item
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            Track package
-                        </button>
-                    </div>
-                </div>
-
             </div>
-        </div>
-    </div>
+        }
+    }
+    else
+    {
+        <p>No RSVP for Upcoming Events.</p>
+    }
+    <br/>
+
+    <h2>Past Events</h2>
+    @if (pastEvents is not null && pastEvents.Count > 0)
+    {
+        foreach (var evt in pastEvents)
+        {
+            <!-- Order -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <!-- Image -->
+
+                        <div class="col-12 col-md-2 text-center">
+                            <a href="/events/@evt.EventId">
+                                @{
+                                    var imageUrl = evt.ImageUrl ?? "/images/placeholder.png";
+                                }
+                                <img src="@imageUrl"
+                                     class="img-fluid border img-thumbnail rounded"
+                                     alt="Product" style="width:150px;height:auto;object-fit:cover">
+                            </a>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="col-12 col-md-7">
+                            <a class="text-decoration-none text-dark" href="/events/@evt.EventId">
+                                <h6 class="fw-bold mb-1">
+                                    @evt.Title
+                                </h6>
+                            </a>
+                            <div class="text-muted small mb-1">
+                                <p class="mt-1 mb-0 text-muted">@($"{evt.BeginDate:MMM d(ddd)}") - @evt.BeginTime.ToString("HH:hh")</p>
+                            </div>
+                            @* <div class="small mb-2">
+                                @($"{evt.BeginDate:MMM d(ddd)}") - @evt.BeginTime.ToString("HH:hh")
+                            </div> *@
+                            @* <div class="small">
+                                Active Noise Cancellation · MagSafe Charging Case · USB-C
+                            </div> *@
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-12 col-md-3 ">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning btn-sm">
+                                    Leave a Review
+                                </button>
+                                @* <button class="btn btn-outline-secondary btn-sm">
+                                    View item
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    Track package
+                                </button> *@
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No Past Events.</p>
+    }
 
 
 
@@ -67,4 +155,15 @@
 @code {
     [Parameter]
     public int UserId { get; set; }
+
+    private List<EventViewModel>? events = new();
+    private List<EventViewModel>? pastEvents = new();
+    private List<EventViewModel>? upcomingEvents = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        events = await ManageUserRSVPEventsService.GetUserRSVPEventByUserId(UserId);
+        pastEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) <= DateTime.Now).ToList();
+        upcomingEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) > DateTime.Now).ToList();
+    }
 }

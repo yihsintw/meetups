@@ -16,6 +16,7 @@ using Meetups.WebApp.Shared.EndPoints;
 using Meetups.WebApp.Features.RSVPEvent;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Security.Claims;
+using Meetups.WebApp.Features.ManageUserRSVPEvents;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddTransient<ViewCreatedEventsService>();
 builder.Services.AddTransient<DiscoverEventsService>();
 builder.Services.AddTransient<ViewEventService>();
 builder.Services.AddTransient<RSVPEventService>();
+builder.Services.AddTransient<ManageUserRSVPEventsService>();
+
 
 
 // Add services to the container.
@@ -80,6 +83,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddCustomPolicies();
 
 var app = builder.Build();
 

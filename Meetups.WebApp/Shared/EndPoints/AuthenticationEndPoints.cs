@@ -73,6 +73,19 @@ namespace Meetups.WebApp.Shared.EndPoints
                         //dbContext.Users.Update(user);
                         await dbContext.SaveChangesAsync();
                     }
+
+                    claims = [
+                        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                        new Claim(ClaimTypes.Name, user.Name ?? ""),
+                        new Claim(ClaimTypes.Email, user.Email ?? ""),
+                        new Claim(ClaimTypes.Role, user.Role ?? "")
+                    ];
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                    //sign in the user with cookie authentication
+                    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
                 }
                 else
                 {
