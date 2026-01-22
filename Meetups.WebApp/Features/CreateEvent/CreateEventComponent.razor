@@ -1,11 +1,14 @@
 ﻿@page "/org/events/create"
 @using Meetups.WebApp.Shared.ViewModels
 @using Meetups.WebApp.Shared
+@using Microsoft.AspNetCore.Authorization
 @using SixLabors.ImageSharp.Processing
 @inject SharedHelper SharedHelper;
 @inject CreateEventService createEventService;
 @inject NavigationManager NavigationManager;
+@inherits BaseComponent
 
+@attribute [Authorize(policy:"OrganizerOnly")]
 
 <ErrorMessageComponent ErrorMessage="@errorMessage" />
 
@@ -28,6 +31,22 @@
 @code {
     private EventViewModel _eventViewModel = new();
     private string errorMessage = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
     private async Task OnErrorMessageChanged(string message)
     {
         errorMessage = message;
@@ -43,6 +62,8 @@
         {
             return;
         }
+
+        _eventViewModel.OrganizerId = base.UserId??0;
 
         await createEventService.CreateEventAsync(_eventViewModel);
 

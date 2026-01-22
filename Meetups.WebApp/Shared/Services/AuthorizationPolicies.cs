@@ -7,6 +7,11 @@ namespace Meetups.WebApp.Shared.Services
     {
         public static void AddCustomPolicies(this AuthorizationBuilder authorizationBuilder)
         {
+            authorizationBuilder.AddPolicy("OrganizerOnly", policy =>
+            {
+                policy.RequireRole(SharedHelper.OrganizerRole);
+            });
+
             authorizationBuilder.AddPolicy("SameUserPolicy", policy =>
             {
                 policy.RequireAssertion(context =>

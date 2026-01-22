@@ -12,8 +12,13 @@ namespace Meetups.WebApp.Shared.Components
         [Inject]
         protected AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-        private AuthenticationState? authenticationState;
+        private AuthenticationState? _authenticationState;
+
         private bool isAuthenticated = false;
+
+        //set property and see if user is organizer
+        public bool IsOrganizer { get => isAuthenticated && _authenticationState != null && _authenticationState.User.IsInRole(SharedHelper.OrganizerRole); }
+        
 
         override protected void OnInitialized()
         {
@@ -22,11 +27,11 @@ namespace Meetups.WebApp.Shared.Components
 
         protected override async Task OnInitializedAsync()
         {
-            await base.OnInitializedAsync();
-            authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            if (authenticationState != null)
+            //await base.OnInitializedAsync();
+            _authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (_authenticationState != null)
             {
-                isAuthenticated = authenticationState.User.Identity != null && authenticationState.User.Identity.IsAuthenticated;
+                isAuthenticated = _authenticationState.User.Identity != null && _authenticationState.User.Identity.IsAuthenticated;
             }
 
             if (isAuthenticated)
@@ -49,9 +54,9 @@ namespace Meetups.WebApp.Shared.Components
         {
             get
             {
-                if (isAuthenticated && authenticationState != null)
+                if (isAuthenticated && _authenticationState != null)
                 {
-                    return authenticationState.User.Identity?.Name;
+                    return _authenticationState.User.Identity?.Name;
                 }
                 return string.Empty;
             }
@@ -61,9 +66,9 @@ namespace Meetups.WebApp.Shared.Components
         {
             get
             {
-                if (isAuthenticated && authenticationState != null)
+                if (isAuthenticated && _authenticationState != null)
                 {
-                    var userIdClaim = authenticationState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                    var userIdClaim = _authenticationState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                     if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
                     {
                         return userId;
@@ -77,9 +82,9 @@ namespace Meetups.WebApp.Shared.Components
         {
             get
             {
-                if (isAuthenticated && authenticationState != null)
+                if (isAuthenticated && _authenticationState != null)
                 {
-                    var userNameClaim = authenticationState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+                    var userNameClaim = _authenticationState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
                     if (userNameClaim != null)
                     {
                         return userNameClaim.Value;

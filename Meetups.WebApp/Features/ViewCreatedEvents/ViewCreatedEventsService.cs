@@ -28,5 +28,19 @@ namespace Meetups.WebApp.Features.ViewCreatedEvents
             return  mapper!.Map<List<EventViewModel>>(events);
         }
 
+        public async Task<List<EventViewModel>> GetEventsByCreatorIdAsync(string creatorId)
+        {
+            if(int.TryParse(creatorId, out var creatorIdInt) == false)
+            {
+                return [];
+            }
+            await using var context = _contextFactory!.CreateDbContext();
+            var events = await context.Events
+                .Where(e => e.OrganizerId == creatorIdInt)
+                .ToListAsync();
+
+            return mapper!.Map<List<EventViewModel>>(events);
+        }
+
     }
 }

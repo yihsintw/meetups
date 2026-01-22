@@ -1,11 +1,13 @@
 ﻿@page "/org/events/edit/{eventid:int}"
 @using Meetups.WebApp.Features.DeleteEvent
 @using Meetups.WebApp.Shared.ViewModels
+@using Microsoft.AspNetCore.Authorization
 @inherits BaseComponent
 
 @inject NavigationManager NavigationManager
 @inject EditEventService editEventService
 @inject NavigationManager navigationManager
+@attribute [Authorize(policy: "OrganizerOnly")]
 
 <h3>Edit Event</h3>
 @if (_eventViewModel is not null)
@@ -49,13 +51,15 @@ else
         if (firstRender)
         {
             _eventViewModel = await editEventService.GetEventForEditAsync(eventId);
-
+            ValidateUserIsCreator(_eventViewModel?.OrganizerId);
+            
             if (_eventViewModel == null)
             {
                 errorMessage = "Event not found.";
                 StateHasChanged();
                 return;
             }
+
             // this.insert new ErrorMessageComponent().ErrorMessage = "Event not found.";
 
 
@@ -104,4 +108,17 @@ else
 
         navigationManager.NavigateTo("/org/events");
     }
+
+    //validate the authenticated user is the creator of the event
+    private void ValidateUserIsCreator(int? organizerId)
+    {
+        if (base.UserId != organizerId)
+        {
+            navigationManager.NavigateTo("/account/AccessDenied", forceLoad: true);
+        }
+    }
+
+        }
+    }
+
 }

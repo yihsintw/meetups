@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Meetups.WebApp.Features.BecomeOrganizer
+@inherits LayoutComponentBase
 @inject LayoutService LayoutService
 @implements IDisposable
 
@@ -15,6 +16,8 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <SearchBarComponent ButtonClass="btn btn-outline-light" SearchUrl="/" />
         </div>
+
+        <BecomeOrganizerComponent />
 
         <LoginStatusComponent />
     </div>
@@ -76,10 +79,11 @@
     {
         await InvokeAsync(StateHasChanged);
     }
-    
+
     public void Dispose()
     {
         LayoutService.OnSectionContentChanged -= UpdateLayoutAsync;
     }
+    
 }
 

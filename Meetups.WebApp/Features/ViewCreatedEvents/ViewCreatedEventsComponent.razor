@@ -1,10 +1,20 @@
 ﻿@page "/org/events"
+
 @using Meetups.WebApp.Features.CreateEvent
 @using Meetups.WebApp.Shared.ViewModels
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+
 @inherits BaseComponent
 
 @inject ViewCreatedEventsService ViewCreatedEventsService;
+
+@attribute [Authorize(policy:"OrganizerOnly")]
+
+@{
+    var isAuthenticated = base.IsAuthenticated;
+}
+@* @attribute [Authorize(policy: "OrganizerOnly")] *@
 
 <h3>Created Events</h3>
 <div>
@@ -59,10 +69,19 @@
     </table>
 }
 @* <button class="btn btn-primary" @onclick="CreateEvent">Create Event</button> *@
+@* <br/>
+<button class="btn btn-primary" @onclick="TestButton">Test Button</button>
+<br/> *@
 <a href="/org/events/create" class="btn btn-primary">Create New Meetup</a>
 @code {
     private int totalCount = 0;
     private List<EventViewModel> createdEvents = new();
+
+    private void TestButton()
+    {
+        var userId = base.UserId;
+        Console.WriteLine("Test Button Clicked");
+    }
 
     private void OnDeleted(int eventId)
     {
@@ -77,21 +96,20 @@
         }
     }
 
+
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);   
+
         if (firstRender)
         {   
-            createdEvents = await ViewCreatedEventsService.GetAllEventsAsync();
+            createdEvents = await ViewCreatedEventsService.GetEventsByCreatorIdAsync(base.UserId?.ToString() ?? "");
             totalCount = createdEvents.Count;
             StateHasChanged();
         }
+
         
-         //base.OnAfterRenderAsync(firstRender);    
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //createdEvents = await ViewCreatedEventsService.GetAllEventsAsync();
-    }
         
 }

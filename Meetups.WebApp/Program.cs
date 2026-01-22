@@ -75,7 +75,7 @@ builder.Services.AddAuthentication(options =>
                     //在這時候還沒有簽cookie,所以要自己簽
                     await context.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.Principal);
                     //然後redirect回應用程式
-                    context.Response.Redirect("/signin-callback");
+                    context.Response.Redirect(location: context.ReturnUri??"");
                     //為了避免後續的處理,要告訴系統這個request(如後續會建立Cookie等)已經處理完了,
                     context.HandleResponse(); // Prevent further processing
                 }

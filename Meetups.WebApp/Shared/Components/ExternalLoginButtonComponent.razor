@@ -28,12 +28,14 @@
 @code {
     //private AuthenticationState? authState;
     private IEnumerable<AuthenticationScheme>? externalLoginProviders;
-    
+    [Parameter]
+    public bool IsForOrganizer { get; set; } = false;
+
     //Login with external provider
     private void LoginWithExternalProvider(string providerName)
     {
        
-        NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+        NavigationManager.NavigateTo($"/authentication/{providerName}{(IsForOrganizer?"/Organizer":"")}", forceLoad: true);
 
     }
 

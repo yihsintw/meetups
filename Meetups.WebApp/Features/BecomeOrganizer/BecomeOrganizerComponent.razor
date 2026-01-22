@@ -1,0 +1,55 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits BaseComponent
+@inject NavigationManager NavigationManager
+
+@if (base.IsOrganizer)
+{
+    <!-- If the user is already an organizer, go to manage events page -->
+    <ul class="navbar-nav ms-auto me-4">
+        <li class="nav-item">
+            <a class="nav-link text-light btn btn-primary" @onclick="ManageEvents">Manage Events</a>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="navbar-nav ms-auto me-4">
+        <li class="nav-item">
+            <a class="nav-link text-light btn btn-primary" @onclick="BecomeOrganizer">Becoem an Organizer</a>
+        </li>
+    </ul>
+}
+
+
+<DialogComponent @ref="loginDialog" Title="Login">
+    <DialogContent>
+        <ExternalLoginButtonComponent IsForOrganizer="true" />
+    </DialogContent>
+</DialogComponent>
+
+@code {
+
+    private DialogComponent loginDialog = default!;
+
+    private void BecomeOrganizer(MouseEventArgs args)
+    {
+        if (!base.IsAuthenticated)
+        {
+            loginDialog.Show();
+        }
+        else
+        {
+            //user is not organizer and wants to become organizer
+            NavigationManager.NavigateTo("/signin-calback/organizer", forceLoad:true);
+
+        }
+
+    }
+
+    private void ManageEvents()
+    {
+        NavigationManager.NavigateTo("/org/events", forceLoad: true);
+
+    }
+
+}
