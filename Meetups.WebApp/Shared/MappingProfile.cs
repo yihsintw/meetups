@@ -13,9 +13,8 @@ namespace Meetups.WebApp.Shared
             CreateMap<EventViewModel, Data.Entities.Event>();
             CreateMap<Data.Entities.Event, EventViewModel>();
 
-
-
-
+            CreateMap<CommentViewModel, Data.Entities.Comment>();
+            CreateMap<Data.Entities.Comment, CommentViewModel>();
         }
     }
 }

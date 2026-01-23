@@ -1,0 +1,113 @@
+﻿@using Meetups.WebApp.Shared.ViewModels
+@inherits BaseComponent
+
+@inject LeaveEventCommentsService LeaveEventCommentsService
+@inject NavigationManager NavigationManager
+
+<h6>Event Comments</h6>
+
+@if(Event is not null)
+{
+    <div class="container mt-4">
+        <!-- Placeholder for comments section -->
+        @{
+            if (comments is not null)
+            {
+                @foreach (CommentViewModel comment in comments)
+                {
+                    <div class="card mb-3" @key="comment.CommentId"> @{/* 加入key以改善blazor執行效能,不用render全部控制項 */}
+                        <div class="card-body">
+                            <p class="card-title">@comment.UserName</p>
+                            <p class="card-subtitle text-muted">@comment.PostedOn.ToString("g")</p>
+                            <p class="card-text">@comment.Message</p>
+                        </div>
+                    </div>
+                }
+
+            }
+        }
+        @* <p>Comments functionality coming soon for event: <strong>@Event.Title</strong></p> *@
+    </div>
+
+    @if (base.IsAuthenticated)
+    {
+        <div class="container mt-4">
+            <div class="card p-3">
+                <div class="mb-3">
+                    <lavel for="@NewComment.Message" class="form-label">Leave a Comment</lavel>
+                    <textarea id="newComment" class="form-control" rows="5" placeholder="Write your comment here..."
+                              @bind="NewComment.Message"></textarea>
+                    <button class="btn btn-primary mt-2" @onclick="SubmitComment">Submit Comment</button>
+                </div>
+            </div>
+
+        </div>
+    }
+    
+
+    
+
+
+}
+else
+{
+    <p>No event data available to display comments.</p>
+}
+    
+
+    
+
+@code {
+
+    [Parameter]
+    public EventViewModel? Event { get; set; }
+    [Parameter]
+    public EventCallback<string> OnCommentSubmitted { get; set; }
+
+    private CommentViewModel NewComment { get; set; } = new CommentViewModel();
+
+    private List<CommentViewModel>? comments { get; set; }
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await ReloadCommentsAsync();
+
+    }
+
+    private async Task ReloadCommentsAsync()
+    {
+        comments = await LeaveEventCommentsService.GetCommentsByEventIdAsync(Event!.EventId);
+    }
+
+    private async Task SubmitComment()
+    {
+        if (Event is not null)
+        {
+            if (string.IsNullOrWhiteSpace(NewComment.Message))
+            {
+                // Optionally, show a message to the user that the comment cannot be empty
+                return;
+            }
+
+            NewComment.EventId = Event.EventId;
+            NewComment.PostedOn = DateTime.Now;
+
+            NewComment.UserName = base.UserName + (base.UserId == Event.OrganizerId.ToString() ? " (Organizer)" : ""); // ?? "Anonymous"; // In a real app, get the logged-in user's name
+
+
+            var result = await LeaveEventCommentsService.AddCommentAsync(NewComment);
+            if (string.IsNullOrEmpty(result))
+            {
+                NewComment = new CommentViewModel(); // Reset the comment box
+
+                //await OnCommentSubmitted.InvokeAsync("Ok");
+                await ReloadCommentsAsync();
+            }
+            else
+            {
+                // Handle error (e.g., show a message to the user)
+            }
+        }
+    }
+}

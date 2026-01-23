@@ -31,5 +31,7 @@ namespace Meetups.WebApp.Data.Entities
 
         public List<RSVP>? RSVPs { get; set; } = [];
 
+        public List<Comment>? Comments { get; set; } = [];
+
     }
 }

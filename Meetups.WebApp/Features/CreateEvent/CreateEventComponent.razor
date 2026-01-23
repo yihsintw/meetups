@@ -63,7 +63,7 @@
             return;
         }
 
-        _eventViewModel.OrganizerId = base.UserId??0;
+        _eventViewModel.OrganizerId = int.Parse(base.UserId??"0"); // (!string.IsNullOrEmpty(base.UserId) ? int.Parse(base.UserId):0);
 
         await createEventService.CreateEventAsync(_eventViewModel);
 

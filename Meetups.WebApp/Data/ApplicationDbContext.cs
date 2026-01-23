@@ -9,6 +9,8 @@ namespace Meetups.WebApp.Data
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         public DbSet<RSVP> RSVPs { get; set; }
 
         override protected void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,6 +29,12 @@ namespace Meetups.WebApp.Data
                 .HasOne(r => r.User)
                 .WithMany(u => u.RSVPs)
                 .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Event)
+                .WithMany(e => e.Comments)
+                .HasForeignKey(c => c.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

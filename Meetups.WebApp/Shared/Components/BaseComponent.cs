@@ -62,7 +62,7 @@ namespace Meetups.WebApp.Shared.Components
             }
         }
 
-        protected int? UserId
+        protected string? UserId
         {
             get
             {
@@ -71,7 +71,7 @@ namespace Meetups.WebApp.Shared.Components
                     var userIdClaim = _authenticationState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                     if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
                     {
-                        return userId;
+                        return userId.ToString();
                     }
                 }
                 return null;

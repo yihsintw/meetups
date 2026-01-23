@@ -17,6 +17,7 @@ using Meetups.WebApp.Features.RSVPEvent;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Security.Claims;
 using Meetups.WebApp.Features.ManageUserRSVPEvents;
+using Meetups.WebApp.Features.LeaveEventComments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddTransient<DiscoverEventsService>();
 builder.Services.AddTransient<ViewEventService>();
 builder.Services.AddTransient<RSVPEventService>();
 builder.Services.AddTransient<ManageUserRSVPEventsService>();
+builder.Services.AddTransient<LeaveEventCommentsService>();
 
 
 
