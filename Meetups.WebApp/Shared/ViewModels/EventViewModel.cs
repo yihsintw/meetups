@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Meetups.WebApp.Migrations;
+using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel.DataAnnotations;
 
 namespace Meetups.WebApp.Shared.ViewModels
@@ -29,7 +30,20 @@ namespace Meetups.WebApp.Shared.ViewModels
         public IBrowserFile? CoverImage { get; set; }
         public string ImageUrl { get; set; }
         public int OrganizerId { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal? TicketPrice { get; set; }
+        public bool Refundable { get; set; }
 
+        public bool HasCost { get;
+            set { 
+                field = value; 
+                if (field == false)
+                { 
+                    TicketPrice = null;
+                    Refundable = false;
+                }
+            }
+        }
         
         public string ValidateDates()
         {
@@ -94,6 +108,8 @@ namespace Meetups.WebApp.Shared.ViewModels
             var coverImageValidationMessage = ValidateCoverImage();
             if (!string.IsNullOrEmpty(coverImageValidationMessage))
                 return coverImageValidationMessage;
+            if (HasCost && !(TicketPrice.HasValue && TicketPrice.Value > 0))
+                return "Ticket price needs be greater than 0";
             return string.Empty;
         }
 

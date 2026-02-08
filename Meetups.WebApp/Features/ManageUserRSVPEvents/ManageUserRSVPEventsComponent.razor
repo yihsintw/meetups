@@ -1,4 +1,4 @@
-﻿@page "/users/{PUserId:int}/manage-rsvp-events"
+﻿@page "/users/{UserId:int}/manage-rsvp-events"
 @using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Authorization
 @inherits  BaseComponent
@@ -154,7 +154,7 @@
 
 @code {
     [Parameter]
-    public int PUserId { get; set; }
+    public int userId { get; set; }
 
     private List<EventViewModel>? events = new();
     private List<EventViewModel>? pastEvents = new();
@@ -162,7 +162,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        events = await ManageUserRSVPEventsService.GetUserRSVPEventByUserId(PUserId);
+        events = await ManageUserRSVPEventsService.GetUserRSVPEventByUserId(userId);
         pastEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) <= DateTime.Now).ToList();
         upcomingEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) > DateTime.Now).ToList();
     }

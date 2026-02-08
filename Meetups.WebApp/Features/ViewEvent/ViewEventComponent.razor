@@ -16,6 +16,18 @@
         <div class="event-hero">
             <img src="@_event.ImageUrl" alt="@_event.Title" class="event-cover-image" />
         </div>
+
+        <h6>Price: 
+        <span class="badge @(_event.TicketPrice > 0 ? "bg-primary" : "bg-success")">
+            @( _event.TicketPrice > 0 ? $"${_event.TicketPrice:F2}" : "FREE")
+        </span></h6>
+        
+        @if (_event.TicketPrice > 0)
+        {
+            <p>Refundable: <span class="badge bg-@( _event.Refundable ? "success" : "danger")">@( _event.Refundable ? "Yes" : "No")</span></p>
+        }
+        
+
         <!-- Description Section -->
         <div class="event-description">
             <h6>Details</h6>

@@ -29,6 +29,13 @@ namespace Meetups.WebApp.Data.Entities
         public string? ImageUrl { get; set; }
         public int OrganizerId { get; set; }
 
+        [Range(0, double.MaxValue)]
+        public decimal? TicketPrice { get; set; }
+
+        public bool Refundable { get; set; }
+
+        public bool HasCost { get; set; }
+
         public List<RSVP>? RSVPs { get; set; } = [];
 
         public List<Comment>? Comments { get; set; } = [];

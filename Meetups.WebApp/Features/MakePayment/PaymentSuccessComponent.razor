@@ -1,0 +1,31 @@
+﻿@page "/payment-success/{eventId}/{checkoutSessionId}"
+
+@inject MakePaymentService MakePaymentService
+@inject NavigationManager NavigationManager
+
+<h3>PaymentSuccessComponent</h3>
+
+@code {
+    [Parameter]
+    public string? eventId { get; set; }
+
+    [Parameter]
+    public string? checkoutSessionId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var session = await MakePaymentService.GetCheckoutSessionAsync(checkoutSessionId??string.Empty);
+
+        if (session != null && session.PaymentStatus == "paid")
+        {
+            // Payment successful, navigate to event details or show success message
+            NavigationManager.NavigateTo($"/rsvp/{eventId}/{session.PaymentIntentId}");
+        }
+        else
+        {
+            // Payment failed or pending, show error message or navigate back to payment page
+            NavigationManager.NavigateTo($"/make-payment/{eventId}");
+        }
+    }
+
+}

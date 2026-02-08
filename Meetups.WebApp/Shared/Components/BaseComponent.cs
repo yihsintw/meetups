@@ -19,10 +19,13 @@ namespace Meetups.WebApp.Shared.Components
         //set property and see if user is organizer
         public bool IsOrganizer { get => isAuthenticated && _authenticationState != null && _authenticationState.User.IsInRole(SharedHelper.OrganizerRole); }
         
+        protected virtual bool ShouldClearSectionContent => true;
 
         override protected void OnInitialized()
         {
-            LayoutService.SetSectionContent(null);
+            if (ShouldClearSectionContent) {
+                LayoutService.SetSectionContent(null);
+            }
         }
 
         protected override async Task OnInitializedAsync()

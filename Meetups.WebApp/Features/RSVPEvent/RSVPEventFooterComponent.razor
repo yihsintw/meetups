@@ -58,7 +58,7 @@ if(_event is not null)
         /*var redirectUrl = "signin-callback";
         NavigationManager.NavigateTo($"/authentication/{providerName}/?redirectUrl={redirectUrl}", forceLoad:true);
         */
-                NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+                                NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
 
     }
 
@@ -81,21 +81,15 @@ if(_event is not null)
         {
             if (msg=="ok")
             {
-                //NavigationManager.NavigateTo($"/signout");
-                
-                var email = authState?.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-                var eventId = _event!.EventId;
-                bool result = await RSVPEventService.RSVPToEventAsync(eventId, email??"");
-                errorMessage = string.Empty;
-                //result = false; // For testing error message display
-                if (result)
+                if (_event!.HasCost)
                 {
-                    NavigationManager.NavigateTo($"/events/{eventId}",forceLoad:true);
+                    // Navigate to payment page
+                    NavigationManager.NavigateTo($"/make-payment/{_event.EventId}", forceLoad: true);
                 }
                 else
                 {
-                    errorMessage = "Error occurred while trying to RSVP. Please try again later.";
-                    StateHasChanged();
+                    // Proceed with RSVP
+                    NavigationManager.NavigateTo($"/rsvp/{_event.EventId}",forceLoad:true);
                 }
 
             }

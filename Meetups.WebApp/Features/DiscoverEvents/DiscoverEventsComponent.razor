@@ -8,41 +8,33 @@
 
 <h3>Events</h3>
 <div class="container">
-        <div class="row g-3">
+    <div class="row g-3">
 
-            @if (_events is not null && _events.Count > 0)
+        @if (_events?.Any() == true)
+        {
+            @foreach (var eventItem in _events)
             {
-                @foreach (var eventItem in _events)
-                {
-                    var imageUrl = eventItem.ImageUrl ?? "/images/placeholder.png";
+                var imageUrl = eventItem.ImageUrl ?? "/images/placeholder.png";
 
-                <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-12" @key="eventItem.EventId">
                     <a href="/events/@eventItem.EventId" class="text-decoration-none">
                         <div class="card border-0">
-                            <img src="@imageUrl" class="card-img-top rounded-3" 
-                            alt="@eventItem.Title" />
-                            <p class="mt-1 mb-0 text-muted">@($"{eventItem.BeginDate:MMM d(ddd)}") - @eventItem.BeginTime.ToString("HH:hh")</p>
+                            <img src="@imageUrl" class="card-img-top rounded-3"
+                                 alt="@eventItem.Title" loading="lazy" decoding="async" />
+                            <p class="mt-1 mb-0 text-muted">@($"{eventItem.BeginDate:MMM d(ddd)}") - @eventItem.BeginTime.ToString("HH:mm")</p>
                             <p class="card-title fw-bold">@eventItem.Title</p>
-                            
-                            @* <p class="card-text">@eventItem.Description</p>
-                             *@
-                            
-                            @* <div class="card-body">
-                                <h5 class="card-title">@eventItem.Title</h5>
-                                <p class="card-text">@eventItem.Description</p>
-                            </div> *@
 
                         </div>
                     </a>
                 </div>
-                }
             }
-            else
-            {
-                <p>No events found.</p>
-            }
-        </div>
-    
+        }
+        else
+        {
+            <p role="status" aria-live="polite">No events found. Try clearing filters or check back later.</p>
+        }
+    </div>
+
 
 
 </div>

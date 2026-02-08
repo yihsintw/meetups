@@ -66,8 +66,12 @@ else
 
     private CommentViewModel NewComment { get; set; } = new CommentViewModel();
 
+
+
     private List<CommentViewModel>? comments { get; set; }
 
+
+    protected override bool ShouldClearSectionContent => false;
 
     protected async override Task OnParametersSetAsync()
     {

@@ -1,0 +1,15 @@
+﻿@page "/rsvp-error/{eventId:int}"
+
+<h3>RSVP Error</h3>
+
+<ErrorMessageComponent Message="An error occurred while processing your RSVP. Please try again later." />
+<br/>
+
+<a class="btn btn-primary" href="/events/@eventId">Back to Events</a>
+
+
+@code {
+    [Parameter]
+    public int eventId { get; set; }
+
+}

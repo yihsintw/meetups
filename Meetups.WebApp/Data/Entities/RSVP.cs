@@ -24,6 +24,10 @@ namespace Meetups.WebApp.Data.Entities
         [Required]
         public string? Status { get; set; } // e.g., "Going", "Not Going"
 
+        //payment info
+        public string? PaymentId { get; set; }
+
+
 
 
 

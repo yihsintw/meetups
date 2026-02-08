@@ -1,0 +1,52 @@
+﻿@page "/make-payment/{eventId:int}"
+@using Meetups.WebApp.Features.ViewEvent
+@using Meetups.WebApp.Shared.ViewModels
+
+@inject MakePaymentService MakePaymentService
+@inject ViewEventService ViewEventService
+
+@inject NavigationManager NavigationManager
+
+@if(_eventViewModel is not null)
+{
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h6>Payment</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>Event:</strong> @_eventViewModel.Title - @($"{_eventViewModel.BeginDate:MMM d(ddd)}") - @_eventViewModel.BeginTime.ToString("HH:hh")</p>
+            <p><strong>Price:</strong> $@_eventViewModel.TicketPrice?.ToString("c")</p>
+            <button class="btn btn-success" @onclick="ProceedToPayment">Proceed to Payment</button>        
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading event dtails...</p>
+}
+
+@code {
+
+    [Parameter]
+    public int eventId { get; set; }
+
+    public EventViewModel? _eventViewModel;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _eventViewModel = await ViewEventService.GetEventByIdAsync(eventId);
+    }
+
+    private async Task ProceedToPayment(MouseEventArgs args)
+    {
+        var baseUrl = NavigationManager.BaseUri;
+        var cancelUrl = NavigationManager.Uri;
+
+        var checkoutUrl = await MakePaymentService.CreateCheckoutSession(_eventViewModel!, baseUrl, cancelUrl);
+        if (!string.IsNullOrEmpty(checkoutUrl))
+        {
+            NavigationManager.NavigateTo(checkoutUrl, forceLoad: true);
+        }
+    }
+}                                                                                                                                                                                                                                                                                                                                                                                                       
+[]

@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Security.Claims;
 using Meetups.WebApp.Features.ManageUserRSVPEvents;
 using Meetups.WebApp.Features.LeaveEventComments;
+using Meetups.WebApp.Features.MakePayment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ builder.Services.AddTransient<ViewEventService>();
 builder.Services.AddTransient<RSVPEventService>();
 builder.Services.AddTransient<ManageUserRSVPEventsService>();
 builder.Services.AddTransient<LeaveEventCommentsService>();
+builder.Services.AddTransient<MakePaymentService>();
+
 
 
 
@@ -109,6 +112,9 @@ app.MapStaticAssets();
 
 //Authentication Endpoints
 app.MapAuthenticationEndPoints();
+
+//Map RSVP Event Endpoints
+app.MapRSVPEventEndPoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

@@ -33,6 +33,9 @@
                 <th>End Time</th>
                 @* <th>Location</th> *@
                 <th>Capacity</th>
+                <th>Has Cost</th>
+                <th>Ticket Price</th>
+                <th>Refundable</th>
                 <th></th>
             </tr>
         </thead>
@@ -60,6 +63,13 @@
                     <td>@eventItem.EndDate  @eventItem.EndTime</td>
                     @* <td>@eventItem.Location</td> *@
                     <td>@(eventItem.Capacity==0?"Unlimited":eventItem.Capacity.ToString())</td>
+
+                    <td>@(eventItem.HasCost ? "Yes" : "No")</td>
+
+                    <td>@(eventItem.TicketPrice.HasValue ? eventItem.TicketPrice.Value.ToString("$#,##0") : "Free")</td>
+
+                    <td>@(eventItem.Refundable ? "Yes" : "No")</td>
+
                     <td>
                         <DeleteEventComponent ButtonClass="btn btn-link" EventViewModel="@eventItem" OnDeleted="OnDeleted" />
                     </td>

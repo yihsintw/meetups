@@ -18,6 +18,11 @@ namespace Meetups.WebApp.Data
 
             base.OnModelCreating(modelBuilder);
 
+            // Configure decimal precision for TicketPrice
+            modelBuilder.Entity<Event>()
+                .Property(e => e.TicketPrice)
+                .HasPrecision(18, 2);
+
             // Configure relationships and constraints if needed
             modelBuilder.Entity<RSVP>()
                 .HasOne(r => r.Event)
