@@ -1,4 +1,5 @@
 ﻿@page "/users/{UserId:int}/manage-rsvp-events"
+@using Meetups.WebApp.Features.CancelRSVP
 @using Meetups.WebApp.Shared.ViewModels
 @using Microsoft.AspNetCore.Authorization
 @inherits  BaseComponent
@@ -52,15 +53,10 @@
                         <!-- Actions -->
                         <div class="col-12 col-md-3 ">
                             <div class="d-grid gap-2">
-                                <button class="btn btn-warning btn-sm">
-                                    Cancel RSVP
-                                </button>
-                                @* <button class="btn btn-outline-secondary btn-sm">
-                                    View item
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    Track package
-                                </button> *@
+
+                                <CancelRSVPComponent EventId="@evt.EventId"
+                                                     OnRSVPCancelled="OnRSVPCancelled" IsRefundable="@evt.Refundable" />
+
                             </div>
                         </div>
 
@@ -119,15 +115,10 @@
                         <!-- Actions -->
                         <div class="col-12 col-md-3 ">
                             <div class="d-grid gap-2">
-                                <button class="btn btn-warning btn-sm">
-                                    Leave a Review
-                                </button>
-                                @* <button class="btn btn-outline-secondary btn-sm">
-                                    View item
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    Track package
-                                </button> *@
+                                @* <CancelRSVPComponent EventId="@evt.EventId" 
+                                 
+                                OnRSVPCancelled="OnRSVPCancelled" /> *@
+                                
                             </div>
                         </div>
 
@@ -140,17 +131,7 @@
     {
         <p>No Past Events.</p>
     }
-
-
-
 </div>
-
-
-
-
-
-
-
 
 @code {
     [Parameter]
@@ -165,5 +146,14 @@
         events = await ManageUserRSVPEventsService.GetUserRSVPEventByUserId(userId);
         pastEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) <= DateTime.Now).ToList();
         upcomingEvents = events.Where(e => e.BeginDate.ToDateTime(e.BeginTime) > DateTime.Now).ToList();
+    }
+
+    private void OnRSVPCancelled(int eventId)
+    {
+        // Remove the cancelled event from the lists
+        events = events?.Where(e => e.EventId != eventId).ToList();
+        pastEvents = pastEvents?.Where(e => e.EventId != eventId).ToList();
+        upcomingEvents = upcomingEvents?.Where(e => e.EventId != eventId).ToList();
+        // Optionally, you can also show a success message or perform other actions here
     }
 }

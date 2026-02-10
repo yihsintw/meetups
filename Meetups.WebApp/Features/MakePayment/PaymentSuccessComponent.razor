@@ -19,7 +19,7 @@
         if (session != null && session.PaymentStatus == "paid")
         {
             // Payment successful, navigate to event details or show success message
-            NavigationManager.NavigateTo($"/rsvp/{eventId}/{session.PaymentIntentId}");
+            NavigationManager.NavigateTo($"/rsvp/{eventId}/{session.PaymentIntentId}/{session.PaymentStatus}");
         }
         else
         {

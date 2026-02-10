@@ -1,0 +1,86 @@
+﻿@using static System.Net.WebRequestMethods
+@inherits BaseComponent
+
+@inject CancelRSVPService CancelRSVPService
+
+@inject NavigationManager NavigationManager
+
+<button class="btn btn-primary" @onclick="CancelRSVP">Cancel RSVP</button>
+<span class="badge bg-@( IsRefundable ? "success" : "danger")" style="width:120px; text-align:center; display:inline-block;">@(IsRefundable ? "Refundable" : "Non-Refundable")</span>
+<ConfirmDialogComponent @ref="confirmDialog" />
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    [Parameter]
+    public bool IsRefundable { get; set; }  
+
+    //public int UserId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRSVPCancelled { get; set; } 
+
+    private ConfirmDialogComponent? confirmDialog;
+
+    private async Task CancelRSVP()
+    {
+        if(EventId>0)
+        {
+            confirmDialog?.Show("Are you sure you want to cancel your RSVP for this event?", 
+                async (result) =>
+                {
+                    if (result == "ok")
+                    {
+                        var userId = int.Parse(base.UserId??"0");
+                        var rsvpId = await CancelRSVPService.CancelRSVPAsync(EventId, userId);
+                        if(rsvpId > 0)
+                        {
+                            await OnRSVPCancelled.InvokeAsync(EventId);
+
+                            NavigationManager.NavigateTo($"/rsvp-cancellation-confirmation/{rsvpId}");
+                        }
+                    }
+                }
+            );
+        }
+        // Call the API to cancel the RSVP
+
+        /*
+        * var response = await Http.DeleteAsync($"/api/rsvps?eventId={EventId}");
+        if (response.IsSuccessStatusCode)
+        {
+            // Notify the parent component that the RSVP has been cancelled
+            await OnRSVPCancelled.InvokeAsync(EventId);
+            }
+        else
+        {
+            // Handle error (e.g., show a message to the user)
+            Console.Error.WriteLine($"Failed to cancel RSVP for event {EventId}: {response.ReasonPhrase}");
+            }
+        */
+    }
+
+    private async Task OnConfirmCancelRSVP(string result)
+    {
+        if(result == "ok")
+        {
+            // Call the API to cancel the RSVP
+            /*
+             * var response = await Http.DeleteAsync($"/api/rsvps?eventId={EventId}");
+            if (response.IsSuccessStatusCode)
+            {
+                // Notify the parent component that the RSVP has been cancelled
+                await OnRSVPCancelled.InvokeAsync(EventId);
+            }
+            else
+            {
+                // Handle error (e.g., show a message to the user)
+                Console.Error.WriteLine($"Failed to cancel RSVP for event {EventId}: {response.ReasonPhrase}");
+            }
+            */
+        }
+
+        
+    }
+}

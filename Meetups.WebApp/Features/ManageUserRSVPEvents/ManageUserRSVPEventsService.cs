@@ -26,7 +26,7 @@ namespace Meetups.WebApp.Features.ManageUserRSVPEvents
 
             var events = await dbContext.RSVPs
                 .Include(r => r.User)
-                .Where(r => r.User!.Email == email)
+                .Where(r => r.User!.Email == email && r.Status == Shared.SharedHelper.GoingStatus)
                 .Include(r => r.Event)
                 .Select(r => r.Event!)
                 .ToListAsync();
@@ -39,7 +39,7 @@ namespace Meetups.WebApp.Features.ManageUserRSVPEvents
             using var dbContext = ContextFactory.CreateDbContext();
             
             var events = await dbContext.RSVPs
-                .Where(r => r.UserId == userId)     
+                .Where(r => r.UserId == userId && r.Status == Shared.SharedHelper.GoingStatus)     
                 .Include(r => r.Event)
                 .Select(r => r.Event!)
                 .ToListAsync();

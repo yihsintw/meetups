@@ -11,9 +11,10 @@ namespace Meetups.WebApp.Features.RSVPEvent
     {
         public static void MapRSVPEventEndPoints(this WebApplication app)
         {
-            app.MapGet("/rsvp/{eventId:int}/{paymentId?}",
+            app.MapGet("/rsvp/{eventId:int}/{paymentId?}/{paymentStatus?}",
                 async (int eventId,
                     string? paymentId,
+                    string? paymentStatus,
                     HttpContext context,
                     RSVPEventService rsvpEventService,
                     IDbContextFactory<ApplicationDbContext> contextFactory) =>
@@ -23,7 +24,7 @@ namespace Meetups.WebApp.Features.RSVPEvent
                     var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                     //var phoneNumber = claims?.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone)?.Value;
 
-                    bool result = await rsvpEventService.RSVPToEventAsync(eventId, email ?? "", paymentId);
+                    bool result = await rsvpEventService.RSVPToEventAsync(eventId, email ?? "", paymentId, paymentStatus);
                     var errorMessage = string.Empty;
                     //result = false; // For testing error message display
                     if (result)
@@ -39,7 +40,9 @@ namespace Meetups.WebApp.Features.RSVPEvent
                     }
 
                 }
-            );
+            )
+            //避免用户直接访问 RSVP 链接，要求用户必须登录才能访问
+            .RequireAuthorization();
         }
     }
 }

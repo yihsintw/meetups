@@ -2,10 +2,11 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@inherits BaseComponent
+@inject RSVPEventService RSVPEventService
 
 @inject IAuthenticationSchemeProvider AuthenticationSchemeProvider
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject RSVPEventService RSVPEventService;
 
 
@@ -46,10 +47,13 @@ if(_event is not null)
 
     private AuthenticationState? authState;
 
+    protected override bool ShouldClearSectionContent => false;
+
     //private IEnumerable<AuthenticationScheme>? externalLoginProviders;
     protected override async Task OnInitializedAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        
 
     }
     //Login with external provider
@@ -58,14 +62,15 @@ if(_event is not null)
         /*var redirectUrl = "signin-callback";
         NavigationManager.NavigateTo($"/authentication/{providerName}/?redirectUrl={redirectUrl}", forceLoad:true);
         */
-                                NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+                                        NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
 
     }
 
 
 
-    private void Attend()
+    private async Task Attend()
     {
+
         if ((authState?.User?.Identity?.IsAuthenticated ?? false) == false)
         {
             // User is authenticated
@@ -81,6 +86,20 @@ if(_event is not null)
         {
             if (msg=="ok")
             {
+                if(string.IsNullOrEmpty(base.UserId))
+                {
+                    await base.ReloadProfile(); // Ensure the profile is reloaded to get the latest user information
+                }
+
+                var userId = int.Parse(base.UserId ?? "0");
+                var result = await RSVPEventService.IsUserRSVPedAsync(_event!.EventId, userId);
+                if(!string.IsNullOrEmpty(result))
+                {
+                    errorMessage = result;
+                    StateHasChanged();
+                    return;
+                }
+
                 if (_event!.HasCost)
                 {
                     // Navigate to payment page

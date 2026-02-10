@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Stripe;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Meetups.WebApp.Data.Entities
@@ -22,10 +23,20 @@ namespace Meetups.WebApp.Data.Entities
 
         //status
         [Required]
-        public string? Status { get; set; } // e.g., "Going", "Not Going"
+        public string? Status { get; set; } // e.g., "Going", "Not Going", "Cancelled"
 
         //payment info
         public string? PaymentId { get; set; }
+
+        //Payment status
+        public string? PaymentStatus { get; set; } // e.g., "Paid", "Pending", "Failed","Refunded"
+
+        //Refund id
+        public string? RefundId { get; set; } = string.Empty;
+
+        public string? RefundStatus { get; set; } = string.Empty;
+
+
 
 
 

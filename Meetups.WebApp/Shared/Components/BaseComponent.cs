@@ -65,6 +65,17 @@ namespace Meetups.WebApp.Shared.Components
             }
         }
 
+        protected async Task ReloadProfile() {
+            if (_authenticationState == null)
+            {
+                _authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                if (_authenticationState != null)
+                {
+                    isAuthenticated = _authenticationState.User.Identity != null && _authenticationState.User.Identity.IsAuthenticated;
+                }
+            }
+        }
+
         protected string? UserId
         {
             get

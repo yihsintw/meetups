@@ -10,13 +10,15 @@ namespace Meetups.WebApp.Shared
         private const string ADMIN_ROLE = "Admin";
         private const string GOING_STATUS = "Going";
         private const string NOT_GOING_STATUS = "Not Going";
-
+        //payment cancel
+        private const string CANCELLED_STATUS = "Cancelled";
 
         public static string AttendeeRole => ATTENDEE_ROLE;
         public static string OrganizerRole => ORGANIZER_ROLE;
         public static string AdminRole => ADMIN_ROLE;
         public static string GoingStatus => GOING_STATUS;
         public static string NotGoingStatus => NOT_GOING_STATUS;
+        public static string CancelledStatus => CANCELLED_STATUS;
 
 
 
