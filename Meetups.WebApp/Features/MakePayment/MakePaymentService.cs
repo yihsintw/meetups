@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Stripe;
 using Stripe.Checkout;
+using Meetups.WebApp.Data.Entities;
+using Meetups.WebApp.Shared;
 
 namespace Meetups.WebApp.Features.MakePayment
 {
@@ -83,5 +85,34 @@ namespace Meetups.WebApp.Features.MakePayment
             var session = await service.GetAsync(sessionId);
             return session;
         }
+
+        //record a transaction by providing Rsvp Id and Payment Status
+        public async Task RecordTransaction(int rsvpId, string? paymentStatus)
+        {
+            //bool result = false;
+
+            using var context = dbContextFactory!.CreateDbContext();
+            var rsvp = await context.RSVPs
+                .Include(r => r.Event)
+                .FirstOrDefaultAsync(r=> r.RsvpId == rsvpId);
+
+            if (rsvp != null && rsvp.Event != null && rsvp.Event.TicketPrice.HasValue && rsvp.Event.TicketPrice.Value > 0)
+            {
+                Transaction transaction = new()
+                {
+                    RsvpId = rsvpId,
+                    PaymentDate = DateTime.Now,
+                    Amount = rsvp.Event.TicketPrice.Value,
+                    TransactionType = SharedHelper.TransactionTypeCharge,
+                    Status = paymentStatus
+                };
+
+                context.Transactions.Add(transaction);
+                await context.SaveChangesAsync();
+            }
+            
+            //return result;
+        }
+
     }
 }

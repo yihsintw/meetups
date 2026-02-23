@@ -40,6 +40,16 @@ namespace Meetups.WebApp.Features.CancelRSVP
                 rsvp.RefundId = refund.Id; // Store the refund ID in the RSVP record
                 rsvp.RefundStatus = refund.Status; // Update the refund status in the RSVP record
 
+                Transaction transaction = new()
+                {
+                    RsvpId = rsvp.RsvpId,
+                    PaymentDate = DateTime.UtcNow,
+                    Amount = -rsvp.Event.TicketPrice.Value, 
+                    TransactionType = SharedHelper.TransactionTypeRefund ,
+                    Status = refund.Status
+                };
+
+                dbContext.Transactions.Add(transaction);
 
             }
 

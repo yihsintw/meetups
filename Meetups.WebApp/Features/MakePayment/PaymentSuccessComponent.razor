@@ -1,5 +1,7 @@
 ﻿@page "/payment-success/{eventId}/{checkoutSessionId}"
 
+@inherits BaseComponent
+@inject RSVPEventService RsvpService
 @inject MakePaymentService MakePaymentService
 @inject NavigationManager NavigationManager
 
@@ -18,8 +20,24 @@
 
         if (session != null && session.PaymentStatus == "paid")
         {
+            //RSVP and create RSVP record
+            var rsvpId = await RsvpService.RSVPToEventAsync(int.Parse(eventId??"0"), base.UserEmail ?? "", session.PaymentIntentId, session.PaymentStatus);
+            
+            //record transaction
+            if(rsvpId > 0)
+            {
+                //record a transaction
+                await MakePaymentService.RecordTransaction(rsvpId, session.PaymentStatus);    
+
+                NavigationManager.NavigateTo($"/users/{base.UserId}/manage-rsvp-events", forceLoad: true);
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"/rsvp-error/{eventId}");
+            }
+
             // Payment successful, navigate to event details or show success message
-            NavigationManager.NavigateTo($"/rsvp/{eventId}/{session.PaymentIntentId}/{session.PaymentStatus}");
+            //NavigationManager.NavigateTo($"/rsvp/{eventId}/{session.PaymentIntentId}/{session.PaymentStatus}");
         }
         else
         {

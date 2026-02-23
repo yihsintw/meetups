@@ -12,6 +12,11 @@ namespace Meetups.WebApp.Shared
         private const string NOT_GOING_STATUS = "Not Going";
         //payment cancel
         private const string CANCELLED_STATUS = "Cancelled";
+        private const string TRANSACTION_TYPE_PAYMENT = "Payment";
+        private const string TRANSACTION_TYPE_CHARGE = "Charge";
+        private const string TRANSACTION_TYPE_REFUND = "Refund";
+
+
 
         public static string AttendeeRole => ATTENDEE_ROLE;
         public static string OrganizerRole => ORGANIZER_ROLE;
@@ -19,6 +24,12 @@ namespace Meetups.WebApp.Shared
         public static string GoingStatus => GOING_STATUS;
         public static string NotGoingStatus => NOT_GOING_STATUS;
         public static string CancelledStatus => CANCELLED_STATUS;
+        public static string TransactionTypeCharge => TRANSACTION_TYPE_CHARGE;
+        public static string TransactionTypePayment => TRANSACTION_TYPE_PAYMENT;
+        public static string TransactionTypeRefund => TRANSACTION_TYPE_REFUND;
+
+
+
 
 
 

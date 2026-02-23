@@ -53,7 +53,7 @@ if(_event is not null)
     protected override async Task OnInitializedAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        
+
 
     }
     //Login with external provider
@@ -62,7 +62,7 @@ if(_event is not null)
         /*var redirectUrl = "signin-callback";
         NavigationManager.NavigateTo($"/authentication/{providerName}/?redirectUrl={redirectUrl}", forceLoad:true);
         */
-                                        NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
+                                                                        NavigationManager.NavigateTo($"/authentication/{providerName}", forceLoad: true);
 
     }
 
@@ -81,6 +81,7 @@ if(_event is not null)
         }
         else
         {
+
             // User is not authenticated
             confirmDialog.Show("Are you sure you want to RSVP for this event?", async (msg) =>
         {
@@ -91,7 +92,10 @@ if(_event is not null)
                     await base.ReloadProfile(); // Ensure the profile is reloaded to get the latest user information
                 }
 
-                var userId = int.Parse(base.UserId ?? "0");
+                var userId = int.Parse(authState?.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var email = authState?.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value??"";
+                //email = base.UserEmail;
+
                 var result = await RSVPEventService.IsUserRSVPedAsync(_event!.EventId, userId);
                 if(!string.IsNullOrEmpty(result))
                 {
@@ -107,8 +111,16 @@ if(_event is not null)
                 }
                 else
                 {
+                    if (await RSVPEventService.RSVPToEventAsync(_event.EventId, email??"") > 0)
+                    {
+                        NavigationManager.NavigateTo($"/users/{userId}/manage-rsvp-events");
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo($"/rsvp-error/{_event.EventId}");
+                    }
                     // Proceed with RSVP
-                    NavigationManager.NavigateTo($"/rsvp/{_event.EventId}",forceLoad:true);
+                    //NavigationManager.NavigateTo($"/rsvp/{_event.EventId}",forceLoad:true);
                 }
 
             }

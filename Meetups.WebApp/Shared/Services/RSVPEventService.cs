@@ -3,14 +3,14 @@ using Meetups.WebApp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
 
-namespace Meetups.WebApp.Features.RSVPEvent
+namespace Meetups.WebApp.Shared.Services
 {
     public class RSVPEventService(IDbContextFactory<ApplicationDbContext> contextFactory)
     {
         public IDbContextFactory<ApplicationDbContext> ContextFactory { get; } = contextFactory;
 
 
-        public async Task<bool> RSVPToEventAsync(int eventId, string email,
+        public async Task<int> RSVPToEventAsync(int eventId, string email,
             string? paymentId = "",
             string? paymentStatus = "")
         {
@@ -21,7 +21,7 @@ namespace Meetups.WebApp.Features.RSVPEvent
             if (user == null)
             {
                 // User not found
-                return false;
+                return 0;
             }
             var userId = user.UserId;
             // Check if the RSVP already exists
@@ -36,11 +36,11 @@ namespace Meetups.WebApp.Features.RSVPEvent
                     existingRSVP.PaymentStatus = paymentStatus;
 
                     await dbContext.SaveChangesAsync();
-                    return true;
+                    return existingRSVP.RsvpId;
                 }
                 else
                 {
-                    return false;
+                    return 0;
                 }
 
             }
@@ -60,12 +60,12 @@ namespace Meetups.WebApp.Features.RSVPEvent
                     };
                     dbContext.RSVPs.Add(rsvp);
                     await dbContext.SaveChangesAsync();
-                    return true;
+                    return rsvp.RsvpId;
                 }
                 catch (Exception ex)
                 {
                     var msg = ex.Message;
-                    return false;
+                    return 0;
                 }
             }
 

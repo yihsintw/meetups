@@ -36,6 +36,8 @@ namespace Meetups.WebApp.Data.Entities
 
         public string? RefundStatus { get; set; } = string.Empty;
 
+        public List<Transaction>? Transactions { get; set; } = [];
+
 
 
 

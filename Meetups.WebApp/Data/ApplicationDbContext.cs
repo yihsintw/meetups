@@ -13,6 +13,8 @@ namespace Meetups.WebApp.Data
 
         public DbSet<RSVP> RSVPs { get; set; }
 
+        public DbSet<Transaction> Transactions { get; set; }
+
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -23,10 +25,20 @@ namespace Meetups.WebApp.Data
                 .Property(e => e.TicketPrice)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<Transaction>()
+                .Property(e => e.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.RSVP)
+                .WithMany(r => r.Transactions)
+                .HasForeignKey(r => r.RsvpId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Configure relationships and constraints if needed
             modelBuilder.Entity<RSVP>()
                 .HasOne(r => r.Event)
-                .WithMany(e => e.RSVPs)
+                .WithMany(e => e.RSVPs) 
                 .HasForeignKey(r => r.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
 

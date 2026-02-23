@@ -1,5 +1,6 @@
 ﻿using Meetups.WebApp.Data;
 using Meetups.WebApp.Data.Entities;
+using Meetups.WebApp.Shared.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -24,10 +25,10 @@ namespace Meetups.WebApp.Features.RSVPEvent
                     var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                     //var phoneNumber = claims?.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone)?.Value;
 
-                    bool result = await rsvpEventService.RSVPToEventAsync(eventId, email ?? "", paymentId, paymentStatus);
+                    var result = await rsvpEventService.RSVPToEventAsync(eventId, email ?? "", paymentId, paymentStatus);
                     var errorMessage = string.Empty;
                     //result = false; // For testing error message display
-                    if (result)
+                    if (result > 0)
                     {
                         using var dbContext = await contextFactory.CreateDbContextAsync();
                         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
