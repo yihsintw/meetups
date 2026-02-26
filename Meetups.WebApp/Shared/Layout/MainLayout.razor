@@ -1,4 +1,5 @@
 ﻿@using Meetups.WebApp.Features.BecomeOrganizer
+@using Meetups.WebApp.Features.ViewTransactions
 @inherits LayoutComponentBase
 @inject LayoutService LayoutService
 @implements IDisposable
@@ -16,6 +17,8 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <SearchBarComponent ButtonClass="btn btn-outline-light" SearchUrl="/" />
         </div>
+
+        <ViewTransactionsButtonComponent />
 
         <BecomeOrganizerComponent />
 

@@ -20,6 +20,7 @@ using Meetups.WebApp.Features.ManageUserRSVPEvents;
 using Meetups.WebApp.Features.LeaveEventComments;
 using Meetups.WebApp.Features.MakePayment;
 using Meetups.WebApp.Features.CancelRSVP;
+using Meetups.WebApp.Features.ViewTransactions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.AddTransient<ManageUserRSVPEventsService>();
 builder.Services.AddTransient<LeaveEventCommentsService>();
 builder.Services.AddTransient<MakePaymentService>();
 builder.Services.AddTransient<CancelRSVPService>();
-
+builder.Services.AddTransient<ViewTransactionsService>();
 
 
 
@@ -116,7 +117,7 @@ app.MapStaticAssets();
 app.MapAuthenticationEndPoints();
 
 //Map RSVP Event Endpoints
-app.MapRSVPEventEndPoints();
+//app.MapRSVPEventEndPoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

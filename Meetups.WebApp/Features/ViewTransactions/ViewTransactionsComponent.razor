@@ -1,16 +1,98 @@
 ﻿@page "/org/transactions"
 @inherits BaseComponent
 @using Meetups.WebApp.Data.Entities
+@using Microsoft.AspNetCore.Authorization
+@inject ViewTransactionsService ViewTransactionsService
+
+@attribute [Authorize(Policy = "OrganizerOnly")]
 
 <h3>Your Transactions</h3>
 
 <div class="container mt-4">
-  @* create a row containing a filter for begin date and end date. This filter is used to filter out transactions*@
-    
+    @* create a row containing a filter for begin date and end date. This filter is used to filter out transactions *@
+        
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="beginDate" class="form-label">Begin Date</label>
+            <input type="date" id="beginDate" class="form-control" @bind="beginDate" />
+        </div>
+        <div class="col-md-4">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" id="endDate" class="form-control" @bind="endDate" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary" @onclick="FilterTransactions">Filter</button>
+        </div>
+     </div>
+
+    @if (transactions is not null && transactions.Any()) {
+        @* Create create a html table to display the transactions with header and footers.The table should have the following columns: Event Titletle, Transaction Type, Status, Payment Date, Amount. *@
+                
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Transaction Type</th>
+                    <th>Status</th>
+                    <th>Payment Date</th>
+                    <th>Paid By</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transaction in transactions)
+                {
+                    <tr>
+                        <td>@transaction.RSVP?.Event?.Title</td>
+                        <td>@transaction.TransactionType</td>
+                        <td>@transaction.Status</td>
+                        <td>@transaction.PaymentDate.ToString("MM/dd/yyyy")</td>
+                        <td>@transaction.RSVP?.User?.Name</td>
+                        <td>@transaction.Amount.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Total Amount:</strong></td>
+                    <td><strong>@transactions.Sum(t => t.Amount).ToString("C")</strong></td>
+                </tr>
+            </tfoot>
+
+        </table>
 
 
 
+
+
+    }
+    else
+    {
+        <p>No transactions found for the selected date range.</p>
+    }
 </div>
 @code {
 
+    private DateTime beginDate = DateTime.Today.AddMonths(-1);
+    private DateTime endDate = DateTime.Today;
+
+    private List<Transaction> transactions = new List<Transaction>();
+    protected override async Task OnInitializedAsync()
+    {
+        //await LoadTransactions();
+    }
+    private async Task LoadTransactions()
+    {
+        transactions = await ViewTransactionsService.GetTransactionsAsync(int.Parse(base.UserId??"0"), beginDate, endDate);
+    }
+
+    private async Task FilterTransactions()
+    {
+        if (string.IsNullOrEmpty(base.UserId))
+        {
+            await base.ReloadProfileAsync(); // Ensure the profile is reloaded to get the latest user information
+        }
+
+        transactions = await ViewTransactionsService.GetTransactionsAsync(int.Parse(base.UserId ?? "0"), beginDate, endDate);
+    }
 }
