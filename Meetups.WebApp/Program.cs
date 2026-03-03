@@ -21,6 +21,8 @@ using Meetups.WebApp.Features.LeaveEventComments;
 using Meetups.WebApp.Features.MakePayment;
 using Meetups.WebApp.Features.CancelRSVP;
 using Meetups.WebApp.Features.ViewTransactions;
+using Meetups.WebApp.Features.ViewOrganizerReviews;
+using Meetups.WebApp.Features.LeaveReview;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +41,8 @@ builder.Services.AddTransient<LeaveEventCommentsService>();
 builder.Services.AddTransient<MakePaymentService>();
 builder.Services.AddTransient<CancelRSVPService>();
 builder.Services.AddTransient<ViewTransactionsService>();
-
+builder.Services.AddTransient<ViewOrganizerReviewsService>();
+builder.Services.AddTransient<LeaveReviewService>();
 
 
 // Add services to the container.

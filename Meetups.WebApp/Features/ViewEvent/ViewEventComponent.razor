@@ -3,6 +3,7 @@
 @using Meetups.WebApp.Features.LeaveEventComments
 @using Meetups.WebApp.Features.RSVPEvent
 @using Meetups.WebApp.Shared.ViewModels
+@using Meetups.WebApp.Features.ViewOrganizerReviews
 @inject ViewEventService ViewEventService;
 @inject LayoutService LayoutService
 
@@ -12,6 +13,7 @@
 
         <!-- Hero Section with Cover Image -->
         <h2 class="event-title">@_event.Title</h2>
+        <OrganizerAverageReviewsComponent OrganizerId="@_event.OrganizerId" />
         <hr />
         <div class="event-hero">
             <img src="@_event.ImageUrl" alt="@_event.Title" class="event-cover-image" />

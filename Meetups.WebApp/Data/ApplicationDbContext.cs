@@ -15,11 +15,10 @@ namespace Meetups.WebApp.Data
 
         public DbSet<Transaction> Transactions { get; set; }
 
+        public DbSet<OrganizerReview> OrganizerReviews { get; set; }
+
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            base.OnModelCreating(modelBuilder);
-
             // Configure decimal precision for TicketPrice
             modelBuilder.Entity<Event>()
                 .Property(e => e.TicketPrice)
@@ -53,6 +52,21 @@ namespace Meetups.WebApp.Data
                 .WithMany(e => e.Comments)
                 .HasForeignKey(c => c.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrganizerReview>()
+                .HasOne(r => r.Organizer)
+                .WithMany(o => o.OrganizerReviews)
+                .HasForeignKey(r => r.OrganizerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrganizerReview>()
+                .HasOne(r => r.ReviewerUser)
+                .WithMany(ru => ru.ReviewsWritten)
+                .HasForeignKey(r => r.ReviewerUserId)
+                .OnDelete(DeleteBehavior.NoAction); ;
+
+            
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

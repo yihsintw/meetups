@@ -69,3 +69,20 @@ h1:focus {
     font-weight: 600;
 }
 
+/* Custom CSS for organizer ratings */
+.stars {
+    font-size:18px;
+    display: flex;
+    -webkit-align-items: inherit;
+    align-items: inherit;
+}
+
+.star {
+    color: lightgray;
+    margin: 2px
+}
+
+.star.selected {
+    color: gold;
+}
+

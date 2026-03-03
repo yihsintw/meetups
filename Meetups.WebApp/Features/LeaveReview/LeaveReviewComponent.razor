@@ -1,0 +1,125 @@
+﻿@page "/org/{OrganizerId:int}/leave-review"
+@using Meetups.WebApp.Data.Entities
+@using Meetups.WebApp.Features.ViewOrganizerReviews
+@inherits BaseComponent
+
+@inject LeaveReviewService LeaveReviewService
+@inject NavigationManager NavigationManager
+
+<h3>Leave a Review for @organizer?.Name</h3>
+<hr class="mb-4" />
+
+<EditForm Model="review" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+    <div class="mb-3">
+        <label for="rating" class="form-label d-block">Set Rating:</label>
+        
+        <div class="d-flex align-items-center mb-2">
+            @for (int i = 1; i <= 5; i++)
+            {
+                var starIndex = i;
+                <span class="star @(i <= review.Rating ? "selected" : "") @(i <= HoverRating ? "hovered-star" : "")" 
+                @onclick="() => SetRating(starIndex)"
+                @onmouseover="()=> OnStarHover(starIndex)" 
+                @onmouseout="() => OnStarMouseOut()"
+                style="cursor: pointer;">&#9733;</span>
+            }   
+        </div>
+
+        <ValidationMessage For="@(() => review.Rating)" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="reviewText" class="form-label">Your Review (Optional):</label>
+        <InputTextArea id="reviewText" class="form-control" @bind-Value="review.ReviewText" rows="5" placeholder="Share your thoughts about the organizer." />
+        <ValidationMessage For="@(() => review.ReviewText)" class="text-danger" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg">Submit Review</button>
+</EditForm>
+
+
+
+@code {
+
+    [Parameter]
+    public int OrganizerId { get; set; }
+
+    private User? organizer { get; set; } = default!;
+    private OrganizerReview review = new OrganizerReview();
+    private int HoverRating { get; set; }
+
+    private bool showSuccessMessage = false;
+    private bool showErrorMessage = false;
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+
+        organizer = await LeaveReviewService.GetUserByIdAsync(OrganizerId);
+
+        if(base.UserId == null)
+        {
+            await base.ReloadProfileAsync();
+        }
+        review = new()
+        {
+            OrganizerId = this.OrganizerId,
+            ReviewerUserId = int.Parse( base.UserId ?? "0"),
+            Rating = 0,
+            ReviewText = string.Empty,
+            ReviewDate = DateTime.Now
+        };
+
+    }
+
+    private void SetRating(int rating)
+    {
+        review.Rating = rating;
+        HoverRating = rating;
+    }
+
+    private void OnStarHover(int rating)
+    {
+        HoverRating = rating;
+    }
+
+    private void OnStarMouseOut()
+    {
+        HoverRating = review.Rating;
+    }
+
+    private async Task HandleValidSubmit(EditContext args)
+    {
+        review.ReviewDate = DateTime.Now;
+
+        try
+        {
+            var result = await LeaveReviewService.ReviewOrganizerAsync(review);
+            showSuccessMessage = result;
+            showErrorMessage = !result;
+            if (result)
+            {
+                // You can also reset the form or clear the review model if needed
+                review = new()
+                {
+                    OrganizerId = this.OrganizerId,
+                    ReviewerUserId = int.Parse(base.UserId ?? "0"),
+                    Rating = 0,
+                    ReviewText = string.Empty,
+                    ReviewDate = DateTime.Now
+                };
+                HoverRating = 0;
+
+                // Optionally, navigate back to the reviews page or show a success message
+                NavigationManager.NavigateTo($"/org/{OrganizerId}/reviews");
+            }
+
+
+        }
+        catch 
+        {
+            showSuccessMessage = false;
+            showErrorMessage = true;
+        }
+    }
+}

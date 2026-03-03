@@ -1,0 +1,44 @@
+﻿@using Meetups.WebApp.Data.Entities
+@inject ViewOrganizerReviewsService ViewOrganizerReviewsService
+
+<div class="d-flex align-items-center mb-2">
+    <span class="fw-bold me-3">@organizer?.Name</span>
+    <div class="d-flex align-items-center">
+        <div class="stars">
+            @for(int i = 1; i <= 5; i++)
+            {
+                <span class="star @(i <= averageRating ? "selected" : "")">&#9733;</span>
+                
+                @* if (i <= Math.Round(organizer?.AverageRating ?? 0))
+                {
+                    <span class="star filled">&#9733;</span>
+                }
+                else
+                {
+                    <span class="star">&#9734;</span>
+                } *@
+            }
+            <a class="ms-2 text-muted" href="@($"/org/{OrganizerId}/reviews")">
+                (@totalReviews Reviews)
+            </a>
+            
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int OrganizerId { get; set; }
+
+    private User? organizer;
+    private int averageRating;
+    private int totalReviews;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        organizer = await ViewOrganizerReviewsService.GetUserByIdAsync(OrganizerId);
+        var (reviewCount, averageRating) = await ViewOrganizerReviewsService.GetOrganizerAverageRatingAsync(OrganizerId);
+        totalReviews = reviewCount;
+        this.averageRating = averageRating;
+    }
+
+}

@@ -1,0 +1,64 @@
+﻿@page "/org/{OrganizerId:int}/reviews"
+@using Meetups.WebApp.Data.Entities
+
+@inject ViewOrganizerReviewsService ViewOrganizerReviewsService
+
+<h3>Reviews for @organizer?.Name</h3>
+
+<div class="d-flex justify-content-center mb-3">
+    <a class="btn btn-primary" href="/org/@OrganizerId/leave-review">Leave a Review</a>
+</div>
+
+@if (reviews == null)
+{
+    <p>Loading reviews...</p>
+}
+
+else if (reviews.Count == 0)
+{
+    <p>No reviews yet. Be the first to leave a review!</p>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var review in reviews)
+            {   
+                <div class="card mb -3">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">Reviewd by: @review.ReviewerUser?.Name on @review.ReviewDate</h6>
+                        <div class="stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(i <= review.Rating ? "selected" : "")">&#9733;</span>                                
+                            }
+                        </div>
+                        <p class="card-text mt-2">@review.ReviewText</p>
+                        
+                    </div>
+                    
+                </div>
+            }
+        </div>
+        
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int OrganizerId { get; set; }
+
+    private User? organizer;    
+    private List<OrganizerReview>? reviews { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        organizer = await ViewOrganizerReviewsService.GetUserByIdAsync(OrganizerId);
+        reviews = await ViewOrganizerReviewsService.GetOrganizerReviewsAsync(OrganizerId);
+
+
+    }
+
+    
+
+}
