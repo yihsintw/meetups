@@ -6,36 +6,60 @@
 @inject LeaveReviewService LeaveReviewService
 @inject NavigationManager NavigationManager
 
-<h3>Leave a Review for @organizer?.Name</h3>
-<hr class="mb-4" />
 
-<EditForm Model="review" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary class="alert alert-danger" />
-    <div class="mb-3">
-        <label for="rating" class="form-label d-block">Set Rating:</label>
-        
-        <div class="d-flex align-items-center mb-2">
-            @for (int i = 1; i <= 5; i++)
-            {
-                var starIndex = i;
-                <span class="star @(i <= review.Rating ? "selected" : "") @(i <= HoverRating ? "hovered-star" : "")" 
-                @onclick="() => SetRating(starIndex)"
-                @onmouseover="()=> OnStarHover(starIndex)" 
-                @onmouseout="() => OnStarMouseOut()"
-                style="cursor: pointer;">&#9733;</span>
-            }   
+<div class="card shadow-sm p-4 mb-4">
+    <h3>Leave a Review for @organizer?.Name</h3>
+    <hr class="mb-4" />
+
+
+    @if (showSuccessMessage)
+    {
+        <div class="alert alert-success">
+            Thank you for your review!
+            <a href="/" class="btn btn-primary">Back to Events</a>
         </div>
+    }
+    else if (showErrorMessage)
+    {
+        <div class="alert alert-danger">
+            An error occurred while submitting your review. Please try again later.
+        </div>
+    }
+    else
+    {
+        <EditForm Model="review" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="alert alert-danger" />
 
-        <ValidationMessage For="@(() => review.Rating)" class="text-danger" />
-    </div>
-    <div class="mb-3">
-        <label for="reviewText" class="form-label">Your Review (Optional):</label>
-        <InputTextArea id="reviewText" class="form-control" @bind-Value="review.ReviewText" rows="5" placeholder="Share your thoughts about the organizer." />
-        <ValidationMessage For="@(() => review.ReviewText)" class="text-danger" />
-    </div>
-    <button type="submit" class="btn btn-primary btn-lg">Submit Review</button>
-</EditForm>
+            <div class="mb-3">
+                <label for="rating" class="form-label d-block">Set Rating:</label>
+        
+                <div class="d-flex align-items-center mb-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        var starIndex = i;
+                        <span class="star @(i <= review.Rating ? "selected" : "") @(i <= HoverRating ? "hovered-star" : "")"
+                              @onclick="() => SetRating(starIndex)"
+                              @onmouseover="() => OnStarHover(starIndex)"
+                              @onmouseout="() => OnStarMouseOut()"
+                              style="cursor: pointer;">&#9733;</span>
+                    }
+                </div>
+
+                <ValidationMessage For="@(() => review.Rating)" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="reviewText" class="form-label">Your Review (Optional):</label>
+                <InputTextArea id="reviewText" class="form-control" @bind-Value="review.ReviewText" rows="5" placeholder="Share your thoughts about the organizer." />
+                <ValidationMessage For="@(() => review.ReviewText)" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Submit Review</button>
+
+        </EditForm>
+    }
+</div>
+    
+
 
 
 
@@ -57,14 +81,14 @@
 
         organizer = await LeaveReviewService.GetUserByIdAsync(OrganizerId);
 
-        if(base.UserId == null)
+        if (base.UserId == null)
         {
             await base.ReloadProfileAsync();
         }
         review = new()
         {
             OrganizerId = this.OrganizerId,
-            ReviewerUserId = int.Parse( base.UserId ?? "0"),
+            ReviewerUserId = int.Parse(base.UserId ?? "0"),
             Rating = 0,
             ReviewText = string.Empty,
             ReviewDate = DateTime.Now
@@ -111,12 +135,12 @@
                 HoverRating = 0;
 
                 // Optionally, navigate back to the reviews page or show a success message
-                NavigationManager.NavigateTo($"/org/{OrganizerId}/reviews");
+                //NavigationManager.NavigateTo($"/org/{OrganizerId}/reviews");
             }
 
 
         }
-        catch 
+        catch
         {
             showSuccessMessage = false;
             showErrorMessage = true;
