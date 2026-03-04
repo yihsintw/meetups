@@ -2,11 +2,13 @@
 @using Meetups.WebApp.Data.Entities
 
 @inject ViewOrganizerReviewsService ViewOrganizerReviewsService
+@inject NavigationManager NavigationManager
 
 <h3>Reviews for @organizer?.Name</h3>
 
 <div class="d-flex justify-content-center mb-3">
-    <a class="btn btn-primary" href="/org/@OrganizerId/leave-review">Leave a Review</a>
+    <a class="btn btn-primary" @onclick="NavigateToLeaveReview">Leave a Review</a>
+    
 </div>
 
 @if (reviews == null)
@@ -58,6 +60,11 @@ else
 
 
     }
+
+    private void NavigateToLeaveReview()
+    {
+        NavigationManager.NavigateTo($"/org/{OrganizerId}/leave-review", forceLoad: true);
+    }   
 
     
 

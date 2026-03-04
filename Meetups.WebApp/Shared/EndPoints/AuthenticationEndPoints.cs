@@ -14,50 +14,50 @@ namespace Meetups.WebApp.Shared.EndPoints
             app.MapGet("/authentication/{providerName}",
             async (string providerName, HttpContext context) =>
             {
-                //系統判斷斷要redirect的Url
-                var redirectUrl = $"{context.Request.Scheme}://{context.Request.Host}/signin-callback";
-                //或是Hard-Coding
-                redirectUrl = "signin-callback";
+                ////系統判斷斷要redirect的Url
+                //var redirectUrl = $"{context.Request.Scheme}://{context.Request.Host}/signin-callback";
+                ////或是Hard-Coding
+                //redirectUrl = "signin-callback";
 
 
-                var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-                await context.ChallengeAsync(providerName, properties);
+                //var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+                await context.ChallengeAsync(providerName);
             });
 
-            app.MapGet("/signin-callback",
-            async (HttpContext context, IDbContextFactory<ApplicationDbContext> contextFactory) =>
-            {
-                //不需要重新驗證,因為已經在外部Provider驗證過
-                /*
-                var authenticateResult = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
-                {
-                    context.Response.Redirect("/");
-                    return;
-                }
-                */
-                await HandleSignInCallback(context, contextFactory);
+            //app.MapGet("/signin-callback",
+            //async (HttpContext context, IDbContextFactory<ApplicationDbContext> contextFactory) =>
+            //{
+            //    //不需要重新驗證,因為已經在外部Provider驗證過
+            //    /*
+            //    var authenticateResult = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //    if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
+            //    {
+            //        context.Response.Redirect("/");
+            //        return;
+            //    }
+            //    */
+            //    await HandleSignInCallback(context, contextFactory);
 
 
-                //無需再次寫入Cookie，因為外部Nuget Package(Provider)已經處理過
-                //將登入資訊寫入Cookie
-                //await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.User);
+            //    //無需再次寫入Cookie，因為外部Nuget Package(Provider)已經處理過
+            //    //將登入資訊寫入Cookie
+            //    //await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.User);
 
-                //登入成功後的邏輯
-                context.Response.Redirect("/");
-            });
+            //    //登入成功後的邏輯
+            //    context.Response.Redirect("/");
+            //});
 
             //organizer authentication
             app.MapGet("/authentication/{providerName}/organizer",
             async (string providerName, HttpContext context) =>
             {
                 //系統判斷斷要redirect的Url
-                var redirectUrl = $"{context.Request.Scheme}://{context.Request.Host}/signin-callback";
-                //或是Hard-Coding
-                redirectUrl = "signin-callback/organizer";
+                //var redirectUrl = $"{context.Request.Scheme}://{context.Request.Host}/signin-callback";
+                ////或是Hard-Coding
+                //redirectUrl = "signin-callback/organizer";
 
-                var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-                await context.ChallengeAsync(providerName, properties);
+                //var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+                await context.ChallengeAsync(providerName);
             });
 
             app.MapGet("/signin-callback/organizer",
@@ -65,7 +65,7 @@ namespace Meetups.WebApp.Shared.EndPoints
             {
                 await HandleSignInCallback(context, contextFactory, isOrganizer: true);
 
-                context.Response.Redirect("/");
+                //context.Response.Redirect("/");
             });
 
             app.MapGet("/signout",
@@ -76,16 +76,24 @@ namespace Meetups.WebApp.Shared.EndPoints
             });
         }
 
-        private static async Task HandleSignInCallback(HttpContext context, IDbContextFactory<ApplicationDbContext> contextFactory, bool isOrganizer = false)
+        public static async Task HandleSignInCallback(
+            HttpContext context, 
+            IDbContextFactory<ApplicationDbContext> contextFactory, 
+            bool isOrganizer = false,
+            TicketReceivedContext? receivedContext = default!) 
+            
         {
-            if (context.User is null || context.User.Identity is null || !context.User.Identity.IsAuthenticated)
-            {
-                context.Response.Redirect("/");
-                
-            }
+            //if (context.User is null || context.User.Identity is null || !context.User.Identity.IsAuthenticated)
+            //{
+            //    context.Response.Redirect("/");
+
+            //}
+
+            //如果外部Provider已經驗證過，則直接使用context.User
+            receivedContext?.Principal ??= context.User;
 
             //取得使用者資訊,例如: Name, Email等,可以根據需求進行處理並寫入資料庫
-            var claims = context.User?.Claims;
+            var claims = receivedContext?.Principal?.Claims;
             var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var phoneNumber = claims?.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone)?.Value;
@@ -128,14 +136,21 @@ namespace Meetups.WebApp.Shared.EndPoints
                         new Claim(ClaimTypes.Email, user.Email ?? ""),
                         new Claim(ClaimTypes.Role, user.Role ?? "")
                 ];
-
+                
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 //sign in the user with cookie authentication
                 await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
+                var returnUrl = receivedContext?.ReturnUri ?? "/";
+                
+                if (returnUrl.Contains("google",StringComparison.OrdinalIgnoreCase))
+                    context.Response.Redirect("/");
+                else
+                    context.Response.Redirect(returnUrl);
             }
 
+            
         }
     }
 }

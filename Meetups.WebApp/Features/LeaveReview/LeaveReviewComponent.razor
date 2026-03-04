@@ -1,11 +1,13 @@
 ﻿@page "/org/{OrganizerId:int}/leave-review"
 @using Meetups.WebApp.Data.Entities
 @using Meetups.WebApp.Features.ViewOrganizerReviews
+@using Microsoft.AspNetCore.Authorization
 @inherits BaseComponent
 
 @inject LeaveReviewService LeaveReviewService
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize]
 
 <div class="card shadow-sm p-4 mb-4">
     <h3>Leave a Review for @organizer?.Name</h3>
@@ -79,20 +81,30 @@
     protected async override Task OnParametersSetAsync()
     {
 
-        organizer = await LeaveReviewService.GetUserByIdAsync(OrganizerId);
+        if (base.IsAuthenticated)
+        {
+            organizer = await LeaveReviewService.GetUserByIdAsync(OrganizerId);
 
-        if (base.UserId == null)
-        {
-            await base.ReloadProfileAsync();
+            if (base.UserId == null)
+            {
+                await base.ReloadProfileAsync();
+            }
+            review = new()
+                {
+                    OrganizerId = this.OrganizerId,
+                    ReviewerUserId = int.Parse(base.UserId!),
+                    Rating = 0,
+                    ReviewText = string.Empty,
+                    ReviewDate = DateTime.Now
+                };
         }
-        review = new()
+        else
         {
-            OrganizerId = this.OrganizerId,
-            ReviewerUserId = int.Parse(base.UserId ?? "0"),
-            Rating = 0,
-            ReviewText = string.Empty,
-            ReviewDate = DateTime.Now
-        };
+            // If the user is not authenticated, you can redirect them to the Google Authentication page
+            NavigationManager.Refresh();//
+        }
+
+        
 
     }
 

@@ -84,9 +84,16 @@ builder.Services.AddAuthentication(options =>
                 {
                     //sign in the user with cookie authentication
                     //在這時候還沒有簽cookie,所以要自己簽
-                    await context.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.Principal);
+                    //await context.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, context.Principal);
+                    AuthenticationEndPoints.HandleSignInCallback(
+                        context.HttpContext, 
+                        context.HttpContext.RequestServices.GetRequiredService<IDbContextFactory<ApplicationDbContext>>(), 
+                        isOrganizer: context.ReturnUri!.Contains("organizer", StringComparison.OrdinalIgnoreCase),
+                        receivedContext: context).Wait();
+
+
                     //然後redirect回應用程式
-                    context.Response.Redirect(location: context.ReturnUri??"");
+                    //context.Response.Redirect(location: context.ReturnUri??"");
                     //為了避免後續的處理,要告訴系統這個request(如後續會建立Cookie等)已經處理完了,
                     context.HandleResponse(); // Prevent further processing
                 }
