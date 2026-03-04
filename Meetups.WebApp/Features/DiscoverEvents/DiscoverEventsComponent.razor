@@ -6,6 +6,7 @@
 @inject DiscoverEventsService DiscoverEventsService
 @inject SharedHelper sharedHelper
 
+
 <h3>Events</h3>
 <div class="container">
     <div class="row g-3">
@@ -31,37 +32,98 @@
         }
         else
         {
-            <p role="status" aria-live="polite">No events found. Try clearing filters or check back later.</p>
+            <div class="col text-center">
+                <p role="status" aria-live="polite">No events found. Try clearing filters or check back later.</p>
+            </div>          
         }
+
+        
+
     </div>
 
-
-
+    @if (_isLoadingMoreEvents)
+    {
+        <div class="col text-center mt-3">
+            <p>Loading more events...</p>
+        </div>
+    }
+    else if (_hasMoreEvents)
+    {
+        <div class="col text-center mt-3">
+            <button class="btn btn-primary" @onclick="LoadEvents">Load More Events</button>
+        </div>
+    }
 </div>
 
 
 @code {
 
-    private List<EventViewModel>? _events;
+    private List<EventViewModel>? _events = new List<EventViewModel>();
+
+    private int _pageSize = 4;
+    private int _pageNumber = 1;
+    private bool _hasMoreEvents = true;
+    private bool _isLoadingMoreEvents = false;
+
 
     //override OnParametersSetAsync()
     protected override async Task OnParametersSetAsync()
     {
+
+        // Initially load events based on query parameters (e.g., search, filters)
+        _pageNumber = 1;
+        _hasMoreEvents = true;
+        await LoadEvents();
+        _isLoadingMoreEvents = false;
+
+
         // Your logic here
         // var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         // var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
         // var filter = queryParams["search"] ?? "";
 
-        var filter = sharedHelper.GetQueryParamValue("search");
+        //var filter = sharedHelper.GetQueryParamValue("search");
         // Perform search logic here
-        _events = await DiscoverEventsService.GetEventsAsync(filter);
+        //_events = await DiscoverEventsService.GetEventsAsync(filter);
 
 
 
 
 
-        await base.OnParametersSetAsync();
+        //await base.OnParametersSetAsync();
 
+        
+    }
+
+    private async Task LoadEvents()
+    {
+        if(_pageNumber == 1)
+        {
+            _isLoadingMoreEvents = false;
+        }
+        else
+        {
+            _isLoadingMoreEvents = true;
+        }
+        var filter = sharedHelper.GetQueryParamValue("search");
+        var newEvents = await DiscoverEventsService.GetEventsAsync(_pageNumber, _pageSize, filter);
+
+        if (newEvents != null && newEvents.Any())
+        {
+            if (_events == null)
+            {
+                _events = new List<EventViewModel>();
+            }
+            _events.AddRange(newEvents);
+            _pageNumber++;
+            _hasMoreEvents = newEvents.Count() == _pageSize; // If we received less than page size, there are no more events to load
+        }
+        else
+        {
+            _hasMoreEvents = false;
+        }
+
+        _isLoadingMoreEvents = false;
     }
 
 }
